@@ -6,6 +6,7 @@ import com.safetynet.safetynetalerts.repository.FireStationRepository;
 import com.safetynet.safetynetalerts.repository.MedicalRecordRepository;
 import com.safetynet.safetynetalerts.repository.PersonRepository;
 import jakarta.annotation.PostConstruct;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +15,11 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 
+@Setter
 @Service
 public class DataImporter {
-    private static final Logger logger = LoggerFactory.getLogger(DataImporter.class);
 
+    private Logger logger = LoggerFactory.getLogger(DataImporter.class);
     @Autowired
     private CustomProperties customProperties;
     @Autowired
@@ -39,6 +41,8 @@ public class DataImporter {
             personRepository.saveAll(dataSource.getPersons());
             fireStationRepository.saveAll((dataSource.getFirestations()));
             medicalRecordRepository.saveAll((dataSource.getMedicalrecords()));
+
+            logger.info("Data source file successfully imported into DB");
 
         } catch (IOException e) {
             logger.error("Error importing Data source file to DB", e);
