@@ -1,60 +1,56 @@
 package com.safetynet.safetynetalerts;
 
-import com.safetynet.safetynetalerts.repository.FireStationRepository;
-import com.safetynet.safetynetalerts.repository.MedicalRecordRepository;
-import com.safetynet.safetynetalerts.repository.PersonRepository;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.safetynet.safetynetalerts.model.DataContainer;
 import com.safetynet.safetynetalerts.service.DataImporter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import java.io.IOException;
-
-import static org.mockito.ArgumentMatchers.any;
+import java.io.File;
+import java.io.FileNotFoundException;
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class DataImporterTest {
 
     @Mock
     private CustomProperties customProperties;
+
     @Mock
-    private PersonRepository personRepository;
-    @Mock
-    private FireStationRepository fireStationRepository;
-    @Mock
-    private MedicalRecordRepository medicalRecordRepository;
-    @Mock
-    private Logger logger;
+    private ObjectMapper objectMapper;
 
     @InjectMocks
     private DataImporter dataImporter;
 
+
     @Test
-    public void dataImport_ShouldLogError_WhenFileNotFound() {
-        when(customProperties.getDataSourceFile()).thenReturn("");
+    public void dataImport_shouldImportDataSuccessfully() throws Exception {
+        when(customProperties.getDataSourceFile()).thenReturn("path/to/fictive/data.json");
+        DataContainer mockDataContainer = new DataContainer();
+        when(objectMapper.readValue(any(File.class), eq(DataContainer.class))).thenReturn(mockDataContainer);
 
         dataImporter.dataImport();
 
-        verify(personRepository, times(0)).saveAll((any()));
-        verify(fireStationRepository, times(0)).saveAll((any()));
-        verify(medicalRecordRepository, times(0)).saveAll((any()));
-
-        verify(logger).error(eq("Error importing Data source file to DB"), any(IOException.class));
+        assertNotNull(dataImporter.getDataContainer());
     }
 
     @Test
-    public void dataImport_ShouldSaveEntitiesToDb_WhenDataSourceFileIsProvided() {
-        when(customProperties.getDataSourceFile()).thenReturn("src/test/resources/testData.json");
+    public void dataImport_shouldThrowFileNotFoundException_whenFileNotFound() throws Exception {
+        when(customProperties.getDataSourceFile()).thenReturn("invalid/path.json");
+        when(objectMapper.readValue(any(File.class), eq(DataContainer.class))).thenThrow(FileNotFoundException.class);
 
-        dataImporter.dataImport();
+        assertThrows(FileNotFoundException.class, () -> dataImporter.dataImport());
+    }
 
-        verify(personRepository, times(1)).saveAll(any());
-        verify(fireStationRepository, times(1)).saveAll(any());
-        verify(medicalRecordRepository, times(1)).saveAll(any());
+    @Test
+    public void dataImport_shouldThrowJsonParseException_whenMalformedJsonFile() throws Exception {
+        when(customProperties.getDataSourceFile()).thenReturn("malformed.json");
+        when(objectMapper.readValue(any(File.class), eq(DataContainer.class))).thenThrow(JsonParseException.class);
 
-        verify(logger).info(eq("Data source file successfully imported into DB"));
+        assertThrows(JsonParseException.class, () -> dataImporter.dataImport());
     }
 }
