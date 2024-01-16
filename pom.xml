@@ -66,7 +66,7 @@
 				</executions>
 				<configuration>
 					<excludes>
-						<exclude>com/safetynet/safetynetalerts/model/*</exclude>
+						<exclude>com/safetynet/alerts/model/*</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

@@ -1,4 +1,4 @@
-package com.safetynet.safetynetalerts;
+package com.safetynet.alerts;
 
 import lombok.Getter;
 import lombok.Setter;
