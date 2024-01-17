@@ -23,11 +23,11 @@ public class DataReader {
 
     public DataContainer dataRead() throws Exception {
 
-        // Import JSON Date source file to POJO with Parsing via Jackson
+        // Import JSON Data source file to POJO with Parsing via Jackson
         try {
             dataContainer = objectMapper.readValue(new File(customProperties.getDataSourceFile()), DataContainer.class);
 
-            log.debug("Data source file read and imported successfully");
+            log.debug("Data file read and imported successfully");
 
         } catch (IOException e) {
             log.error("Error reading and importing data source file: " + e.getMessage(), e);

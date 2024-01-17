@@ -4,8 +4,7 @@ import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.service.PersonService;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,5 +17,15 @@ public class PersonController {
     @GetMapping("/person")
     public ResponseEntity<List<Person>> getPersons() throws Exception {
         return personService.getPersons();
+    }
+
+    @DeleteMapping("/person")
+    public ResponseEntity<Void> deletePerson(@RequestParam String firstName, @RequestParam String lastName) throws Exception {
+        return personService.deletePerson(firstName, lastName);
+    }
+
+    @PutMapping("/person")
+    public ResponseEntity<Person> updatePerson(@RequestBody Person person) throws Exception {
+        return personService.updatePerson(person);
     }
 }

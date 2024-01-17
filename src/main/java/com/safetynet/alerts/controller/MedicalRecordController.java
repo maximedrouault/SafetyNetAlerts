@@ -4,8 +4,7 @@ import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.service.MedicalRecordService;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,4 +19,13 @@ public class MedicalRecordController {
         return medicalRecordService.getMedicalRecords();
     }
 
+    @DeleteMapping("/medicalRecord")
+    public ResponseEntity<Void> deleteMedicalRecord(@RequestParam String firstName, @RequestParam String lastName) throws Exception {
+        return medicalRecordService.deleteMedicalRecord(firstName, lastName);
+    }
+
+    @PutMapping("/medicalRecord")
+    public ResponseEntity<MedicalRecord> updateMedicalRecord(@RequestBody MedicalRecord medicalRecord) throws Exception {
+        return medicalRecordService.updateMedicalRecord(medicalRecord);
+    }
 }
