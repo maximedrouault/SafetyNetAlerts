@@ -36,8 +36,8 @@ public class PersonService {
             if (person.getFirstName().equals(firstName) && person.getLastName().equals(lastName)) {
                 persons.remove(person);
 
-                log.info("Person successfully deleted");
                 dataWriter.dataWrite(dataContainer);
+                log.info("Person successfully deleted");
 
                 return ResponseEntity.ok().build();
             }
@@ -61,8 +61,8 @@ public class PersonService {
                 existingPerson.setPhone(personToUpdate.getPhone());
                 existingPerson.setEmail(personToUpdate.getEmail());
 
-                log.info("Person successfully updated");
                 dataWriter.dataWrite(dataContainer);
+                log.info("Person successfully updated");
 
                 return ResponseEntity.ok(existingPerson);
             }
@@ -70,5 +70,26 @@ public class PersonService {
 
         log.error("Not updated, Person not found");
         return ResponseEntity.notFound().build();
+    }
+
+    public ResponseEntity<Person> addPerson(Person personToAdd) throws Exception {
+        DataContainer dataContainer = dataReader.dataRead();
+        List<Person> persons = dataContainer.getPersons();
+
+        for (Person existingPerson : persons) {
+            if (existingPerson.getFirstName().equals(personToAdd.getFirstName()) &&
+                    existingPerson.getLastName().equals(personToAdd.getLastName())) {
+
+                log.error("Not added, Person already exist");
+                return ResponseEntity.badRequest().build();
+            }
+        }
+
+        persons.add(personToAdd);
+
+        dataWriter.dataWrite(dataContainer);
+        log.info("Person successfully added");
+
+        return ResponseEntity.ok(personToAdd);
     }
 }

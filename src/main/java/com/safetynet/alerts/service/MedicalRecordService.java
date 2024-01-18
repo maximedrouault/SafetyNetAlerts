@@ -36,8 +36,8 @@ public class MedicalRecordService {
             if (medicalRecord.getFirstName().equals(firstName) && medicalRecord.getLastName().equals(lastName)) {
                 medicalRecords.remove(medicalRecord);
 
-                log.info("MedicalRecord successfully deleted");
                 dataWriter.dataWrite(dataContainer);
+                log.info("MedicalRecord successfully deleted");
 
                 return ResponseEntity.ok().build();
             }
@@ -59,8 +59,8 @@ public class MedicalRecordService {
                 existingMedicalRecord.setMedications(medicalRecordToUpdate.getMedications());
                 existingMedicalRecord.setAllergies(medicalRecordToUpdate.getAllergies());
 
-                log.info("Medical record successfully updated");
                 dataWriter.dataWrite(dataContainer);
+                log.info("Medical record successfully updated");
 
                 return ResponseEntity.ok(existingMedicalRecord);
             }
@@ -68,5 +68,26 @@ public class MedicalRecordService {
 
         log.error("Not updated, Medical record not found");
         return ResponseEntity.notFound().build();
+    }
+
+    public ResponseEntity<MedicalRecord> addMedicalRecord(MedicalRecord medicalRecordToAdd) throws Exception {
+        DataContainer dataContainer = dataReader.dataRead();
+        List<MedicalRecord> medicalRecords = dataContainer.getMedicalrecords();
+
+        for (MedicalRecord existingMedicalRecord : medicalRecords) {
+            if (existingMedicalRecord.getFirstName().equals(medicalRecordToAdd.getFirstName()) &&
+                    existingMedicalRecord.getLastName().equals(medicalRecordToAdd.getLastName())) {
+
+                log.error("Not added, Medical record already exist");
+                return ResponseEntity.badRequest().build();
+            }
+        }
+
+        medicalRecords.add(medicalRecordToAdd);
+
+        dataWriter.dataWrite(dataContainer);
+        log.info("Medical record successfully added");
+
+        return ResponseEntity.ok(medicalRecordToAdd);
     }
 }

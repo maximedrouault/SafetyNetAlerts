@@ -28,4 +28,9 @@ public class PersonController {
     public ResponseEntity<Person> updatePerson(@RequestBody Person person) throws Exception {
         return personService.updatePerson(person);
     }
+
+    @PostMapping("/person")
+    public ResponseEntity<Person> addPerson(@RequestBody Person person) throws Exception {
+        return personService.addPerson(person);
+    }
 }

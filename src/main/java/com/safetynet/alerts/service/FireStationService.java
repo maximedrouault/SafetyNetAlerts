@@ -32,12 +32,13 @@ public class FireStationService {
         DataContainer dataContainer = dataReader.dataRead();
         List<FireStation> fireStations = dataContainer.getFirestations();
 
-        for (FireStation fireStation : fireStations) {
-            if (fireStation.getAddress().equals(address) && fireStation.getStation() == station) {
-                fireStations.remove(fireStation);
+        for (FireStation existingFireStation : fireStations) {
+            if (existingFireStation.getAddress().equals(address) && existingFireStation.getStation() == station) {
 
-                log.info("Fire Station mapping for address '{}' and station '{}' successfully deleted", address, station);
+                fireStations.remove(existingFireStation);
+
                 dataWriter.dataWrite(dataContainer);
+                log.info("Fire Station mapping for address '{}' and station '{}' successfully deleted", address, station);
 
                 return ResponseEntity.ok().build();
             }
@@ -47,7 +48,7 @@ public class FireStationService {
         return ResponseEntity.notFound().build();
     }
 
-    public ResponseEntity<FireStation> updateFireStation(FireStation fireStationToUpdate) throws Exception {
+    public ResponseEntity<FireStation> updateFireStationMapping(FireStation fireStationToUpdate) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<FireStation> fireStations = dataContainer.getFirestations();
 
@@ -56,8 +57,8 @@ public class FireStationService {
 
                 existingFireStation.setStation(fireStationToUpdate.getStation());
 
-                log.info("Fire station mapping successfully updated");
                 dataWriter.dataWrite(dataContainer);
+                log.info("Fire station mapping successfully updated");
 
                 return ResponseEntity.ok(existingFireStation);
             }
@@ -65,5 +66,26 @@ public class FireStationService {
 
         log.error("Not updated, Fire station not found");
         return ResponseEntity.notFound().build();
+    }
+
+    public ResponseEntity<FireStation> addFireStationMapping(FireStation fireStationToAdd) throws Exception {
+        DataContainer dataContainer = dataReader.dataRead();
+        List<FireStation> fireStations = dataContainer.getFirestations();
+
+        for (FireStation existingFireStation : fireStations) {
+            if (existingFireStation.getStation() == fireStationToAdd.getStation() &&
+            existingFireStation.getAddress().equals(fireStationToAdd.getAddress())) {
+
+                log.error("Not added, Fire station mapping already exist");
+                return ResponseEntity.badRequest().build();
+            }
+        }
+
+        fireStations.add(fireStationToAdd);
+
+        dataWriter.dataWrite(dataContainer);
+        log.info("Fire station mapping successfully added");
+
+        return ResponseEntity.ok(fireStationToAdd);
     }
 }

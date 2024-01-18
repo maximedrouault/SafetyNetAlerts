@@ -25,7 +25,12 @@ public class FireStationController {
     }
 
     @PutMapping("/firestation")
-    public ResponseEntity<FireStation> updateFireStation(@RequestBody FireStation fireStation) throws Exception {
-        return fireStationService.updateFireStation(fireStation);
+    public ResponseEntity<FireStation> updateFireStationMapping(@RequestBody FireStation fireStation) throws Exception {
+        return fireStationService.updateFireStationMapping(fireStation);
+    }
+
+    @PostMapping("/firestation")
+    public ResponseEntity<FireStation> addFireStationMapping(@RequestBody FireStation fireStation) throws Exception {
+        return fireStationService.addFireStationMapping(fireStation);
     }
 }

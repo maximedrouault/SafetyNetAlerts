@@ -30,7 +30,7 @@ public class DataReader {
             log.debug("Data file read and imported successfully");
 
         } catch (IOException e) {
-            log.error("Error reading and importing data source file: " + e.getMessage(), e);
+            log.error("Error reading and importing data source file: " + e.getMessage());
             throw e;
         }
 

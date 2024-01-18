@@ -20,7 +20,6 @@ public class DataReaderTest {
 
     @Mock
     private CustomProperties customProperties;
-
     @Mock
     private ObjectMapper objectMapper;
 
@@ -29,7 +28,7 @@ public class DataReaderTest {
 
 
     @Test
-    public void dataRead_shouldImportDataSuccessfully() throws Exception {
+    public void dataRead_shouldImportDataSuccessfully_whenJsonDataFileIsProvided() throws Exception {
         when(customProperties.getDataSourceFile()).thenReturn("path/to/fictive/testData.json");
         DataContainer mockDataContainer = new DataContainer();
         when(objectMapper.readValue(any(File.class), eq(DataContainer.class))).thenReturn(mockDataContainer);

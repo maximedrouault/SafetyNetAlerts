@@ -31,7 +31,7 @@ public class DataWriter {
             log.debug("Data successfully exported and written to file");
 
         } catch (IOException e) {
-            log.error("Error exporting and writing data file: " + e.getMessage(), e);
+            log.error("Error exporting and writing data file: " + e.getMessage());
             throw e;
         }
     }

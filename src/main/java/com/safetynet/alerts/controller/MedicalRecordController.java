@@ -28,4 +28,9 @@ public class MedicalRecordController {
     public ResponseEntity<MedicalRecord> updateMedicalRecord(@RequestBody MedicalRecord medicalRecord) throws Exception {
         return medicalRecordService.updateMedicalRecord(medicalRecord);
     }
+
+    @PostMapping("medicalRecord")
+    public ResponseEntity<MedicalRecord> addMedicalRecord(@RequestBody MedicalRecord medicalRecord) throws Exception {
+        return medicalRecordService.addMedicalRecord(medicalRecord);
+    }
 }
