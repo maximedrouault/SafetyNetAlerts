@@ -4,9 +4,9 @@ import com.safetynet.alerts.model.DataContainer;
 import com.safetynet.alerts.model.MedicalRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,78 +16,81 @@ public class MedicalRecordService {
     private final DataReader dataReader;
     private final DataWriter dataWriter;
 
-    public ResponseEntity<List<MedicalRecord>> getMedicalRecords() throws Exception {
-            List<MedicalRecord> medicalRecords = dataReader.dataRead().getMedicalrecords();
+    // CRUD
 
-            if (medicalRecords.isEmpty()) {
-                log.error("No Medical Records found");
-                return ResponseEntity.notFound().build();
-            } else {
-                log.info("Medical Records successfully retrieved");
-                return ResponseEntity.ok(medicalRecords);
-            }
-    }
-
-    public ResponseEntity<Void> deleteMedicalRecord(String firstName, String lastName) throws Exception {
+    public boolean deleteMedicalRecord(MedicalRecord medicalRecordToDelete) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<MedicalRecord> medicalRecords = dataContainer.getMedicalrecords();
 
-        for (MedicalRecord medicalRecord : medicalRecords) {
-            if (medicalRecord.getFirstName().equals(firstName) && medicalRecord.getLastName().equals(lastName)) {
-                medicalRecords.remove(medicalRecord);
+        Optional<MedicalRecord> foundMedicalRecord = medicalRecords.stream()
+                .filter(existingMedicalRecord ->
+                        existingMedicalRecord.getFirstName().equals(medicalRecordToDelete.getFirstName()) &&
+                        existingMedicalRecord.getLastName().equals(medicalRecordToDelete.getLastName()))
+                .findFirst();
 
-                dataWriter.dataWrite(dataContainer);
-                log.info("MedicalRecord successfully deleted");
+        if (foundMedicalRecord.isPresent()) {
+            medicalRecords.remove(foundMedicalRecord.get());
 
-                return ResponseEntity.ok().build();
-            }
+            dataWriter.dataWrite(dataContainer);
+            log.info("MedicalRecord successfully deleted");
+
+            return true;
+
+        } else {
+            log.error("MedicalRecord not found");
+            return false;
         }
-
-        log.error("MedicalRecord not found");
-        return ResponseEntity.notFound().build();
     }
 
-    public ResponseEntity<MedicalRecord> updateMedicalRecord(MedicalRecord medicalRecordToUpdate) throws Exception {
+    public Optional<MedicalRecord> updateMedicalRecord(MedicalRecord medicalRecordToUpdate) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<MedicalRecord> medicalRecords = dataContainer.getMedicalrecords();
 
-        for (MedicalRecord existingMedicalRecord : medicalRecords) {
-            if (existingMedicalRecord.getFirstName().equals(medicalRecordToUpdate.getFirstName()) &&
-                    existingMedicalRecord.getLastName().equals(medicalRecordToUpdate.getLastName())) {
+        Optional<MedicalRecord> foundMedicalRecord = medicalRecords.stream()
+                .filter(existingMedicalRecord ->
+                        existingMedicalRecord.getFirstName().equals(medicalRecordToUpdate.getFirstName()) &&
+                        existingMedicalRecord.getLastName().equals(medicalRecordToUpdate.getLastName()))
+                .findFirst();
 
-                existingMedicalRecord.setBirthdate(medicalRecordToUpdate.getBirthdate());
-                existingMedicalRecord.setMedications(medicalRecordToUpdate.getMedications());
-                existingMedicalRecord.setAllergies(medicalRecordToUpdate.getAllergies());
+        if (foundMedicalRecord.isPresent()) {
+            MedicalRecord updatedMedicalRecord = foundMedicalRecord.get();
 
-                dataWriter.dataWrite(dataContainer);
-                log.info("Medical record successfully updated");
+            updatedMedicalRecord.setBirthdate(medicalRecordToUpdate.getBirthdate());
+            updatedMedicalRecord.setMedications(medicalRecordToUpdate.getMedications());
+            updatedMedicalRecord.setAllergies(medicalRecordToUpdate.getAllergies());
 
-                return ResponseEntity.ok(existingMedicalRecord);
-            }
+            dataWriter.dataWrite(dataContainer);
+            log.info("Medical record successfully updated");
+
+            return Optional.of(updatedMedicalRecord);
+
+        } else {
+            log.error("Not updated, Medical record not found");
+            return Optional.empty();
         }
-
-        log.error("Not updated, Medical record not found");
-        return ResponseEntity.notFound().build();
     }
 
-    public ResponseEntity<MedicalRecord> addMedicalRecord(MedicalRecord medicalRecordToAdd) throws Exception {
+    public Optional<MedicalRecord> addMedicalRecord(MedicalRecord medicalRecordToAdd) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<MedicalRecord> medicalRecords = dataContainer.getMedicalrecords();
 
-        for (MedicalRecord existingMedicalRecord : medicalRecords) {
-            if (existingMedicalRecord.getFirstName().equals(medicalRecordToAdd.getFirstName()) &&
-                    existingMedicalRecord.getLastName().equals(medicalRecordToAdd.getLastName())) {
+        Optional<MedicalRecord> foundMedicalRecord = medicalRecords.stream()
+                .filter(existingMedicalRecord ->
+                        existingMedicalRecord.getFirstName().equals(medicalRecordToAdd.getFirstName()) &&
+                        existingMedicalRecord.getLastName().equals(medicalRecordToAdd.getLastName()))
+                .findFirst();
 
-                log.error("Not added, Medical record already exist");
-                return ResponseEntity.badRequest().build();
-            }
+        if (foundMedicalRecord.isPresent()) {
+            log.error("Not added, Medical record already exist");
+            return Optional.empty();
+
+        } else {
+            medicalRecords.add(medicalRecordToAdd);
+
+            dataWriter.dataWrite(dataContainer);
+            log.info("Medical record successfully added");
+
+            return Optional.of(medicalRecordToAdd);
         }
-
-        medicalRecords.add(medicalRecordToAdd);
-
-        dataWriter.dataWrite(dataContainer);
-        log.info("Medical record successfully added");
-
-        return ResponseEntity.ok(medicalRecordToAdd);
     }
 }

@@ -4,9 +4,9 @@ import com.safetynet.alerts.model.DataContainer;
 import com.safetynet.alerts.model.FireStation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,76 +16,78 @@ public class FireStationService {
     private final DataReader dataReader;
     private final DataWriter dataWriter;
 
-    public ResponseEntity<List<FireStation>> getFireStations() throws Exception {
-            List<FireStation> fireStations = dataReader.dataRead().getFirestations();
+    // CRUD
 
-            if (fireStations.isEmpty()) {
-                log.error("No Fire Stations found");
-                return ResponseEntity.notFound().build();
-            } else {
-                log.info("Fire Stations successfully retrieved");
-                return ResponseEntity.ok(fireStations);
-            }
-    }
-
-    public ResponseEntity<Void> deleteFireStationMapping(String address, int station) throws Exception {
+    public boolean deleteFireStationMapping(FireStation fireStationToDelete) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<FireStation> fireStations = dataContainer.getFirestations();
 
-        for (FireStation existingFireStation : fireStations) {
-            if (existingFireStation.getAddress().equals(address) && existingFireStation.getStation() == station) {
+        Optional<FireStation> foundFirestation = fireStations.stream()
+                .filter(existingFireStation ->
+                        existingFireStation.getAddress().equals(fireStationToDelete.getAddress()) &&
+                        existingFireStation.getStation() == fireStationToDelete.getStation())
+                .findFirst();
 
-                fireStations.remove(existingFireStation);
+        if (foundFirestation.isPresent()) {
+            fireStations.remove(foundFirestation.get());
 
-                dataWriter.dataWrite(dataContainer);
-                log.info("Fire Station mapping for address '{}' and station '{}' successfully deleted", address, station);
+            dataWriter.dataWrite(dataContainer);
+            log.info("Fire Station mapping successfully deleted");
 
-                return ResponseEntity.ok().build();
-            }
+            return true;
+
+        } else {
+            log.error("Fire Station mapping not found");
+            return false;
         }
-
-        log.error("Fire Station mapping for address '{}' and station '{}' not found", address, station);
-        return ResponseEntity.notFound().build();
     }
 
-    public ResponseEntity<FireStation> updateFireStationMapping(FireStation fireStationToUpdate) throws Exception {
+    public Optional<FireStation> updateFireStationMapping(FireStation fireStationToUpdate) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<FireStation> fireStations = dataContainer.getFirestations();
 
-        for (FireStation existingFireStation : fireStations) {
-            if (existingFireStation.getAddress().equals(fireStationToUpdate.getAddress())) {
+        Optional<FireStation> foundFireStation = fireStations.stream()
+                .filter(existingFireStation ->
+                        existingFireStation.getAddress().equals(fireStationToUpdate.getAddress()))
+                .findFirst();
 
-                existingFireStation.setStation(fireStationToUpdate.getStation());
+        if (foundFireStation.isPresent()) {
+            FireStation updatedFireStation = foundFireStation.get();
 
-                dataWriter.dataWrite(dataContainer);
-                log.info("Fire station mapping successfully updated");
+            updatedFireStation.setStation(fireStationToUpdate.getStation());
 
-                return ResponseEntity.ok(existingFireStation);
-            }
+            dataWriter.dataWrite(dataContainer);
+            log.info("Fire Station mapping successfully updated");
+
+            return Optional.of(updatedFireStation);
+
+        } else {
+            log.error("Not updated, Fire station not found");
+            return Optional.empty();
         }
-
-        log.error("Not updated, Fire station not found");
-        return ResponseEntity.notFound().build();
     }
 
-    public ResponseEntity<FireStation> addFireStationMapping(FireStation fireStationToAdd) throws Exception {
+    public Optional<FireStation> addFireStationMapping(FireStation fireStationToAdd) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<FireStation> fireStations = dataContainer.getFirestations();
 
-        for (FireStation existingFireStation : fireStations) {
-            if (existingFireStation.getStation() == fireStationToAdd.getStation() &&
-            existingFireStation.getAddress().equals(fireStationToAdd.getAddress())) {
+        Optional<FireStation> foundFireStation = fireStations.stream()
+                .filter(existingFireStation ->
+                        existingFireStation.getAddress().equals(fireStationToAdd.getAddress()) &&
+                        existingFireStation.getStation() == fireStationToAdd.getStation())
+                .findFirst();
 
-                log.error("Not added, Fire station mapping already exist");
-                return ResponseEntity.badRequest().build();
-            }
+        if (foundFireStation.isPresent()) {
+            log.error("Not added, Fire station mapping already exist");
+            return Optional.empty();
+
+        } else {
+            fireStations.add(fireStationToAdd);
+
+            dataWriter.dataWrite(dataContainer);
+            log.info("Fire station mapping successfully added");
+
+            return Optional.of(fireStationToAdd);
         }
-
-        fireStations.add(fireStationToAdd);
-
-        dataWriter.dataWrite(dataContainer);
-        log.info("Fire station mapping successfully added");
-
-        return ResponseEntity.ok(fireStationToAdd);
     }
 }

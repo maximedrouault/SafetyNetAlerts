@@ -3,7 +3,6 @@ package com.safetynet.alerts.integration.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,9 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -52,14 +48,5 @@ public class FireStationControllerIT {
         } catch (IOException e) {
             log.error("Error deleting temp data file for test : " + e.getMessage());
         }
-    }
-
-
-    @Test
-    public void fireStationControllerIT() throws Exception {
-        mockMvc.perform(get("/firestation"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].address").value("1509 Culver St"))
-                .andExpect(jsonPath("$[0].station").value("3"));
     }
 }

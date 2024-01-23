@@ -2,14 +2,10 @@ package com.safetynet.alerts.unitaire.controller;
 
 import com.safetynet.alerts.controller.MedicalRecordController;
 import com.safetynet.alerts.service.MedicalRecordService;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = MedicalRecordController.class)
 public class MedicalRecordControllerTest {
@@ -19,10 +15,4 @@ public class MedicalRecordControllerTest {
 
     @MockBean
     private MedicalRecordService medicalRecordService;
-
-    @Test
-    public void testGetMedicalRecords() throws Exception {
-        mockMvc.perform(get("/medicalRecord"))
-                .andExpect(status().isOk());
-    }
 }

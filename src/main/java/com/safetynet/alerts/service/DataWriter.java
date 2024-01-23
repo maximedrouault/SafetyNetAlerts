@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.safetynet.alerts.CustomProperties;
 import com.safetynet.alerts.model.DataContainer;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,10 +13,10 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
-@Data
 @Slf4j
 public class DataWriter {
 
+    private final ObjectMapper objectMapper;
     private final CustomProperties customProperties;
 
 
@@ -25,7 +24,7 @@ public class DataWriter {
 
         // Export POJO to JSON Data destination file with Serialization via Jackson
         try {
-            ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             objectMapper.writeValue(new File(customProperties.getDataSourceFile()), dataContainer);
 
             log.debug("Data successfully exported and written to file");

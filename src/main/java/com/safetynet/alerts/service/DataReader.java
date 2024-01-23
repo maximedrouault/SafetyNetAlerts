@@ -3,7 +3,6 @@ package com.safetynet.alerts.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safetynet.alerts.CustomProperties;
 import com.safetynet.alerts.model.DataContainer;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,16 +11,15 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
-@Data
 @Slf4j
 public class DataReader {
 
-    private DataContainer dataContainer;
     private final ObjectMapper objectMapper;
     private final CustomProperties customProperties;
 
 
     public DataContainer dataRead() throws Exception {
+        DataContainer dataContainer;
 
         // Import JSON Data source file to POJO with Parsing via Jackson
         try {

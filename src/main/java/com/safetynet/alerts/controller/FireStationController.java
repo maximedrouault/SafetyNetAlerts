@@ -3,10 +3,11 @@ package com.safetynet.alerts.controller;
 import com.safetynet.alerts.model.FireStation;
 import com.safetynet.alerts.service.FireStationService;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Optional;
 
 @Data
 @RestController
@@ -14,23 +15,26 @@ public class FireStationController {
 
     private final FireStationService fireStationService;
 
-    @GetMapping("/firestation")
-    public ResponseEntity<List<FireStation>> getFireStations() throws Exception {
-        return fireStationService.getFireStations();
-    }
+    // CRUD
 
     @DeleteMapping("/firestation")
-    public ResponseEntity<Void> deleteFireStationMapping(@RequestParam String address, @RequestParam int station) throws Exception {
-        return fireStationService.deleteFireStationMapping(address, station);
+    public ResponseEntity<Void> deleteFireStationMapping(@RequestBody FireStation fireStationToDelete) throws Exception {
+        return fireStationService.deleteFireStationMapping(fireStationToDelete) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 
     @PutMapping("/firestation")
-    public ResponseEntity<FireStation> updateFireStationMapping(@RequestBody FireStation fireStation) throws Exception {
-        return fireStationService.updateFireStationMapping(fireStation);
+    public ResponseEntity<FireStation> updateFireStationMapping(@RequestBody FireStation fireStationToUpdate) throws Exception {
+        Optional<FireStation> updatedFireStation = fireStationService.updateFireStationMapping(fireStationToUpdate);
+        return updatedFireStation
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/firestation")
-    public ResponseEntity<FireStation> addFireStationMapping(@RequestBody FireStation fireStation) throws Exception {
-        return fireStationService.addFireStationMapping(fireStation);
+    public ResponseEntity<FireStation> addFireStationMapping(@RequestBody FireStation fireStationToAdd) throws Exception {
+        Optional<FireStation> addedFireStation = fireStationService.addFireStationMapping(fireStationToAdd);
+        return addedFireStation
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.CONFLICT).build());
     }
 }

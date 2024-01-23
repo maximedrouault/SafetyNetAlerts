@@ -3,10 +3,11 @@ package com.safetynet.alerts.controller;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.service.PersonService;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Optional;
 
 @Data
 @RestController
@@ -14,23 +15,26 @@ public class PersonController {
 
     private final PersonService personService;
 
-    @GetMapping("/person")
-    public ResponseEntity<List<Person>> getPersons() throws Exception {
-        return personService.getPersons();
-    }
+    // CRUD
 
     @DeleteMapping("/person")
-    public ResponseEntity<Void> deletePerson(@RequestParam String firstName, @RequestParam String lastName) throws Exception {
-        return personService.deletePerson(firstName, lastName);
+    public ResponseEntity<Void> deletePerson(@RequestBody Person personToDelete) throws Exception {
+        return personService.deletePerson(personToDelete) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 
     @PutMapping("/person")
-    public ResponseEntity<Person> updatePerson(@RequestBody Person person) throws Exception {
-        return personService.updatePerson(person);
+    public ResponseEntity<Person> updatePerson(@RequestBody Person personToUpdate) throws Exception {
+        Optional<Person> updatedPerson = personService.updatePerson(personToUpdate);
+        return updatedPerson
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/person")
-    public ResponseEntity<Person> addPerson(@RequestBody Person person) throws Exception {
-        return personService.addPerson(person);
+    public ResponseEntity<Person> addPerson(@RequestBody Person personToAdd) throws Exception {
+        Optional<Person> addedPerson = personService.addPerson(personToAdd);
+        return addedPerson
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.CONFLICT).build());
     }
 }

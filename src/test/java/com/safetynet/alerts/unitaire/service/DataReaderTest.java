@@ -29,13 +29,13 @@ public class DataReaderTest {
 
     @Test
     public void dataRead_shouldImportDataSuccessfully_whenJsonDataFileIsProvided() throws Exception {
+        DataContainer dataContainer = new DataContainer();
         when(customProperties.getDataSourceFile()).thenReturn("path/to/fictive/testData.json");
-        DataContainer mockDataContainer = new DataContainer();
-        when(objectMapper.readValue(any(File.class), eq(DataContainer.class))).thenReturn(mockDataContainer);
+        when(objectMapper.readValue(any(File.class), eq(DataContainer.class))).thenReturn(dataContainer);
 
         dataReader.dataRead();
 
-        assertNotNull(dataReader.getDataContainer());
+        assertNotNull(dataReader.dataRead());
     }
 
     @Test

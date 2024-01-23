@@ -4,9 +4,9 @@ import com.safetynet.alerts.model.DataContainer;
 import com.safetynet.alerts.model.Person;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,80 +16,81 @@ public class PersonService {
     private final DataReader dataReader;
     private final DataWriter dataWriter;
 
-    public ResponseEntity<List<Person>> getPersons() throws Exception {
-        List<Person> persons = dataReader.dataRead().getPersons();
+    // CRUD
 
-        if (persons.isEmpty()) {
-            log.error("No Persons found");
-            return ResponseEntity.notFound().build();
+    public boolean deletePerson(Person personToDelete) throws Exception {
+        DataContainer dataContainer = dataReader.dataRead();
+        List<Person> persons = dataContainer.getPersons();
+
+        Optional<Person> foundPerson = persons.stream()
+                .filter(existingPerson ->
+                        existingPerson.getFirstName().equals(personToDelete.getFirstName()) &&
+                        existingPerson.getLastName().equals(personToDelete.getLastName()))
+                .findFirst();
+
+        if (foundPerson.isPresent()) {
+            persons.remove(foundPerson.get());
+
+            dataWriter.dataWrite(dataContainer);
+            log.info("Person successfully deleted");
+
+            return true;
+
         } else {
-            log.info("Persons successfully retrieved");
-            return ResponseEntity.ok(persons);
+            log.error("Person not found");
+            return false;
         }
     }
 
-    public ResponseEntity<Void> deletePerson(String firstName, String lastName) throws Exception {
+    public Optional<Person> updatePerson(Person personToUpdate) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<Person> persons = dataContainer.getPersons();
 
-        for (Person person : persons) {
-            if (person.getFirstName().equals(firstName) && person.getLastName().equals(lastName)) {
-                persons.remove(person);
+        Optional<Person> foundPerson = persons.stream()
+                .filter(existingPerson ->
+                        existingPerson.getFirstName().equals(personToUpdate.getFirstName()) &&
+                        existingPerson.getLastName().equals(personToUpdate.getLastName()))
+                .findFirst();
 
-                dataWriter.dataWrite(dataContainer);
-                log.info("Person successfully deleted");
+        if (foundPerson.isPresent()) {
+            Person updatedPerson = foundPerson.get();
 
-                return ResponseEntity.ok().build();
-            }
+            updatedPerson.setAddress(personToUpdate.getAddress());
+            updatedPerson.setCity(personToUpdate.getCity());
+            updatedPerson.setZip(personToUpdate.getZip());
+            updatedPerson.setPhone(personToUpdate.getPhone());
+            updatedPerson.setEmail(personToUpdate.getEmail());
+
+            dataWriter.dataWrite(dataContainer);
+            log.info("Person successfully updated");
+
+            return Optional.of(updatedPerson);
+        } else {
+            log.error("Not updated, Person not found");
+            return Optional.empty();
         }
-
-        log.error("Person not found");
-        return ResponseEntity.notFound().build();
     }
 
-    public ResponseEntity<Person> updatePerson(Person personToUpdate) throws Exception {
+    public Optional<Person> addPerson(Person personToAdd) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<Person> persons = dataContainer.getPersons();
 
-        for (Person existingPerson : persons) {
-            if (existingPerson.getFirstName().equals(personToUpdate.getFirstName()) &&
-                    existingPerson.getLastName().equals(personToUpdate.getLastName())) {
+        Optional<Person> foundPerson = persons.stream()
+                .filter(existingPerson ->
+                        existingPerson.getFirstName().equals(personToAdd.getFirstName()) &&
+                                existingPerson.getLastName().equals(personToAdd.getLastName()))
+                .findFirst();
 
-                existingPerson.setAddress(personToUpdate.getAddress());
-                existingPerson.setCity(personToUpdate.getCity());
-                existingPerson.setZip(personToUpdate.getZip());
-                existingPerson.setPhone(personToUpdate.getPhone());
-                existingPerson.setEmail(personToUpdate.getEmail());
+        if (foundPerson.isPresent()) {
+            log.error("Not added, Person already exist");
+            return Optional.empty();
+        } else {
+            persons.add(personToAdd);
 
-                dataWriter.dataWrite(dataContainer);
-                log.info("Person successfully updated");
+            dataWriter.dataWrite(dataContainer);
+            log.info("Person successfully added");
 
-                return ResponseEntity.ok(existingPerson);
-            }
+            return Optional.of(personToAdd);
         }
-
-        log.error("Not updated, Person not found");
-        return ResponseEntity.notFound().build();
-    }
-
-    public ResponseEntity<Person> addPerson(Person personToAdd) throws Exception {
-        DataContainer dataContainer = dataReader.dataRead();
-        List<Person> persons = dataContainer.getPersons();
-
-        for (Person existingPerson : persons) {
-            if (existingPerson.getFirstName().equals(personToAdd.getFirstName()) &&
-                    existingPerson.getLastName().equals(personToAdd.getLastName())) {
-
-                log.error("Not added, Person already exist");
-                return ResponseEntity.badRequest().build();
-            }
-        }
-
-        persons.add(personToAdd);
-
-        dataWriter.dataWrite(dataContainer);
-        log.info("Person successfully added");
-
-        return ResponseEntity.ok(personToAdd);
     }
 }
