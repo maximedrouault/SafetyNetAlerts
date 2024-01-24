@@ -2,15 +2,16 @@ package com.safetynet.alerts.controller;
 
 import com.safetynet.alerts.model.FireStation;
 import com.safetynet.alerts.service.FireStationService;
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
-@Data
+
 @RestController
+@RequiredArgsConstructor
 public class FireStationController {
 
     private final FireStationService fireStationService;
