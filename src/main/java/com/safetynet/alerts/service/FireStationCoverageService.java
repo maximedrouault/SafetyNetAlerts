@@ -36,7 +36,7 @@ public class FireStationCoverageService {
                 .collect(Collectors.toSet());
 
         if (coveredAddresses.isEmpty()) {
-            log.error("No addresses covered by station number {}", stationNumber);
+            log.error("No address covered by station number {}", stationNumber);
             return Optional.empty();
         }
 
@@ -47,7 +47,7 @@ public class FireStationCoverageService {
                 .toList();
 
         if (coveredPersons.isEmpty()) {
-            log.error("No persons covered at these addresses for station number {}", stationNumber);
+            log.error("No person covered at these addresses for station number {}", stationNumber);
             return Optional.empty();
         }
 
@@ -77,7 +77,7 @@ public class FireStationCoverageService {
         long adultsCount = ages.size() - childrenCount;
 
 
-        // Step 5 : Return PersonInfoDTO object
+        // Step 6 : Return PersonInfoDTO object
         List<PersonInfoDTO> personsInfoDTO = coveredPersons.stream()
                 .map(person -> {
                     PersonInfoDTO personInfoDTO = new PersonInfoDTO();
