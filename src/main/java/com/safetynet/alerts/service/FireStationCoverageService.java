@@ -8,7 +8,9 @@ import com.safetynet.alerts.model.Person;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import java.time.Year;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,33 +52,29 @@ public class FireStationCoverageService {
         }
 
 
-        // Step 3 : Obtain a list of years of birthdate of covered Persons
-        Map<String, MedicalRecord> nameToMedicalRecordMap = medicalRecords.stream()
-                .collect(Collectors.toMap(
-                        medicalRecord -> medicalRecord.getFirstName() + " " + medicalRecord.getLastName(),
-                        medicalRecord -> medicalRecord));
-
-        List<MedicalRecord> coveredMedicalRecords = coveredPersons.stream()
-                .map(person -> nameToMedicalRecordMap.get(person.getFirstName() + " " + person.getLastName()))
-                .filter(Objects::nonNull)
+        // Step 3 : Obtain a list of MedicalRecord covered to access birthdate
+        List<MedicalRecord> coveredMedicalRecords = medicalRecords.stream()
+                .filter(medicalRecord -> coveredPersons.stream()
+                        .anyMatch(person -> person.getFirstName().equals(medicalRecord.getFirstName()) &&
+                                person.getLastName().equals(medicalRecord.getLastName())))
                 .toList();
 
-        List<Integer> yearsOfBirth = coveredMedicalRecords.stream()
+
+        // Step 4 : Extraction of dates of birth to calculate ages
+        List<Integer> ages = coveredMedicalRecords.stream()
                 .map(medicalRecord -> {
-                    String birthdate = medicalRecord.getBirthdate();
-                    return Integer.parseInt(birthdate.substring(birthdate.length() - 4));
+                    LocalDate birthdate = LocalDate.parse(medicalRecord.getBirthdate(), DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+                    return Period.between(birthdate, LocalDate.now()).getYears();
                 })
                 .toList();
 
 
-        // Step 4 : Count number of Adults and Children
-        int currentYear = Year.now().getValue();
-
-        long childrenCount = yearsOfBirth.stream()
-                        .filter(yearOfBirth -> (currentYear - yearOfBirth) <= 18)
+        // Step 5 : Count number of Adults and Children based on ages extracted
+        long childrenCount = ages.stream()
+                        .filter(age -> age <= 18)
                         .count();
 
-        long adultsCount = yearsOfBirth.size() - childrenCount;
+        long adultsCount = ages.size() - childrenCount;
 
 
         // Step 5 : Return PersonInfoDTO object
@@ -95,7 +93,7 @@ public class FireStationCoverageService {
                 })
                 .toList();
 
-        log.info("Fire station coverage for station number {} processed. Adults count: {}, Children count: {}", stationNumber, adultsCount, childrenCount);
+        log.info("Fire station coverage for station number '{}' processed. Adults count: {}, Children count: {}", stationNumber, adultsCount, childrenCount);
         return Optional.of(personsInfoDTO);
     }
 }
