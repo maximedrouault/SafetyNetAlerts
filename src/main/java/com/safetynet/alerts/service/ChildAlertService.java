@@ -1,6 +1,6 @@
 package com.safetynet.alerts.service;
 
-import com.safetynet.alerts.dto.ChildInfoDTO;
+import com.safetynet.alerts.dto.PersonChildAlertDTO;
 import com.safetynet.alerts.model.DataContainer;
 import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.model.Person;
@@ -21,7 +21,7 @@ public class ChildAlertService {
 
     private final DataReader dataReader;
 
-    public Optional<List<ChildInfoDTO>> getChildAlert(String address) throws Exception {
+    public Optional<List<PersonChildAlertDTO>> getChildAlert(String address) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<Person> persons = dataContainer.getPersons();
         List<MedicalRecord> medicalRecords = dataContainer.getMedicalrecords();
@@ -58,13 +58,13 @@ public class ChildAlertService {
                 .toList();
 
 
-        // Step 3 : Return ChildInfoDTO object
-        List<ChildInfoDTO> childrenInfoDTO = children.stream()
+        // Step 3 : Return PersonChildAlertDTO object
+        List<PersonChildAlertDTO> personsChildAlertDTO = children.stream()
                 .map(child -> {
-                    ChildInfoDTO childInfoDTO = new ChildInfoDTO();
+                    PersonChildAlertDTO personChildAlertDTO = new PersonChildAlertDTO();
 
-                    childInfoDTO.setFirstName(child.getFirstName());
-                    childInfoDTO.setLastName(child.getLastName());
+                    personChildAlertDTO.setFirstName(child.getFirstName());
+                    personChildAlertDTO.setLastName(child.getLastName());
 
                     // Calculate age and set it in the DTO
                     Optional<MedicalRecord> childMedicalRecord = medicalRecords.stream()
@@ -77,7 +77,7 @@ public class ChildAlertService {
                         LocalDate birthdate = LocalDate.parse(childMedicalRecord.get().getBirthdate(), DateTimeFormatter.ofPattern("MM/dd/yyyy"));
                         int age = Period.between(birthdate, LocalDate.now()).getYears();
 
-                        childInfoDTO.setAge(age);
+                        personChildAlertDTO.setAge(age);
                     }
 
                     // Add member of family in the DTO
@@ -89,15 +89,15 @@ public class ChildAlertService {
                             .toList();
 
                     if (!familyMember.isEmpty()) {
-                        childInfoDTO.setFamilyMembers(familyMember);
+                        personChildAlertDTO.setFamilyMembers(familyMember);
                     }
 
-                    return childInfoDTO;
+                    return personChildAlertDTO;
                 })
                 .toList();
 
 
         log.info("Child alert processed for address '{}'.", address);
-        return Optional.of(childrenInfoDTO);
+        return Optional.of(personsChildAlertDTO);
     }
 }

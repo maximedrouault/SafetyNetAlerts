@@ -1,6 +1,6 @@
 package com.safetynet.alerts.service;
 
-import com.safetynet.alerts.dto.PersonPhoneDTO;
+import com.safetynet.alerts.dto.PersonPhoneAlertDTO;
 import com.safetynet.alerts.model.DataContainer;
 import com.safetynet.alerts.model.FireStation;
 import com.safetynet.alerts.model.Person;
@@ -20,7 +20,7 @@ public class PhoneAlertService {
 
     private final DataReader dataReader;
 
-    public Optional<List<PersonPhoneDTO>> getPhoneAlert(int fireStationNumber) throws Exception {
+    public Optional<List<PersonPhoneAlertDTO>> getPhoneAlert(int fireStationNumber) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<FireStation> fireStations = dataContainer.getFirestations();
         List<Person> persons = dataContainer.getPersons();
@@ -49,18 +49,18 @@ public class PhoneAlertService {
         }
 
 
-        // Step 5 : Return PersonPhoneDTO object
-        List<PersonPhoneDTO> personsPhoneDTO = coveredPersons.stream()
+        // Step 5 : Return PersonPhoneAlertDTO object
+        List<PersonPhoneAlertDTO> personsPhoneAlertDTO = coveredPersons.stream()
                 .map(person -> {
-                    PersonPhoneDTO personPhoneDTO = new PersonPhoneDTO();
+                    PersonPhoneAlertDTO personPhoneAlertDTO = new PersonPhoneAlertDTO();
 
-                    personPhoneDTO.setPhone(person.getPhone());
+                    personPhoneAlertDTO.setPhone(person.getPhone());
 
-                    return personPhoneDTO;
+                    return personPhoneAlertDTO;
                 })
                 .toList();
 
         log.info("Phone alert for station number '{}' processed.", fireStationNumber);
-        return Optional.of(personsPhoneDTO);
+        return Optional.of(personsPhoneAlertDTO);
     }
 }

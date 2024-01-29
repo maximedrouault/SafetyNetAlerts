@@ -1,6 +1,7 @@
 package com.safetynet.alerts.service;
 
-import com.safetynet.alerts.dto.PersonInfoDTO;
+import com.safetynet.alerts.dto.FireStationCoverageResponseDTO;
+import com.safetynet.alerts.dto.PersonFireStationCoverageDTO;
 import com.safetynet.alerts.model.DataContainer;
 import com.safetynet.alerts.model.FireStation;
 import com.safetynet.alerts.model.MedicalRecord;
@@ -22,7 +23,7 @@ public class FireStationCoverageService {
 
     private final DataReader dataReader;
 
-    public Optional<List<PersonInfoDTO>> getFireStationCoverage(int stationNumber) throws Exception {
+    public FireStationCoverageResponseDTO getFireStationCoverage(int stationNumber) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<FireStation> fireStations = dataContainer.getFirestations();
         List<Person> persons = dataContainer.getPersons();
@@ -35,21 +36,11 @@ public class FireStationCoverageService {
                 .map(FireStation::getAddress)
                 .collect(Collectors.toSet());
 
-        if (coveredAddresses.isEmpty()) {
-            log.error("No address covered by station number {}", stationNumber);
-            return Optional.empty();
-        }
-
 
         // Step 2 : Obtain a list of Persons covered based on "coveredAddresses"
         List<Person> coveredPersons = persons.stream()
                 .filter(person -> coveredAddresses.contains(person.getAddress()))
                 .toList();
-
-        if (coveredPersons.isEmpty()) {
-            log.error("No person covered at these addresses for station number {}", stationNumber);
-            return Optional.empty();
-        }
 
 
         // Step 3 : Obtain a list of MedicalRecord covered to access birthdate
@@ -77,23 +68,33 @@ public class FireStationCoverageService {
         long adultsCount = ages.size() - childrenCount;
 
 
-        // Step 6 : Return PersonInfoDTO object
-        List<PersonInfoDTO> personsInfoDTO = coveredPersons.stream()
+        // Step 6 : Create PersonFireStationCoverageDTO object
+        List<PersonFireStationCoverageDTO> personsFireStationCoverageDTO = coveredPersons.stream()
                 .map(person -> {
-                    PersonInfoDTO personInfoDTO = new PersonInfoDTO();
+                    PersonFireStationCoverageDTO personFireStationCoverageDTO = new PersonFireStationCoverageDTO();
 
-                    personInfoDTO.setFirstName(person.getFirstName());
-                    personInfoDTO.setLastName(person.getLastName());
-                    personInfoDTO.setAddress(person.getAddress());
-                    personInfoDTO.setPhone(person.getPhone());
-                    personInfoDTO.setAdultsCount((int) adultsCount);
-                    personInfoDTO.setChildrenCount((int) childrenCount);
+                    personFireStationCoverageDTO.setFirstName(person.getFirstName());
+                    personFireStationCoverageDTO.setLastName(person.getLastName());
+                    personFireStationCoverageDTO.setAddress(person.getAddress());
+                    personFireStationCoverageDTO.setPhone(person.getPhone());
 
-                    return personInfoDTO;
+                    return personFireStationCoverageDTO;
                 })
                 .toList();
 
+        // Create the DTO response object with nested PersonFireStationCoverageDTO
+        FireStationCoverageResponseDTO fireStationsCoverageResponseDTO = new FireStationCoverageResponseDTO();
+        fireStationsCoverageResponseDTO.setPersons(personsFireStationCoverageDTO);
+        fireStationsCoverageResponseDTO.setAdultsCount((int) adultsCount);
+        fireStationsCoverageResponseDTO.setChildrenCount((int) childrenCount);
+
+
+        if (fireStationsCoverageResponseDTO.getPersons().isEmpty()) {
+            log.error("No address or person covered by station number {}", stationNumber);
+            return fireStationsCoverageResponseDTO;
+        }
+
         log.info("Fire station coverage for station number '{}' processed. Adults count: {}, Children count: {}", stationNumber, adultsCount, childrenCount);
-        return Optional.of(personsInfoDTO);
+        return fireStationsCoverageResponseDTO;
     }
 }
