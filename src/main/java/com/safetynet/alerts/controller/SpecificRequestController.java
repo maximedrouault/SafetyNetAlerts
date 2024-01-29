@@ -1,13 +1,7 @@
 package com.safetynet.alerts.controller;
 
-import com.safetynet.alerts.dto.FireStationCoverageResponseDTO;
-import com.safetynet.alerts.dto.PersonChildAlertDTO;
-import com.safetynet.alerts.dto.PersonFireAddressInfoDTO;
-import com.safetynet.alerts.dto.PersonPhoneAlertDTO;
-import com.safetynet.alerts.service.ChildAlertService;
-import com.safetynet.alerts.service.FireAddressInfoService;
-import com.safetynet.alerts.service.FireStationCoverageService;
-import com.safetynet.alerts.service.PhoneAlertService;
+import com.safetynet.alerts.dto.*;
+import com.safetynet.alerts.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,13 +19,14 @@ public class SpecificRequestController {
     private final FireAddressInfoService fireAddressInfoService;
     private final FireStationCoverageService fireStationCoverageService;
     private final PhoneAlertService phoneAlertService;
+    private final CommunityEmailService communityEmailService;
 
 
     // ChildAlert
     @GetMapping("/childAlert")
     public ResponseEntity<List<PersonChildAlertDTO>> getChildAlert(@RequestParam String address) throws Exception {
-        Optional<List<PersonChildAlertDTO>> childInfoDTO = childAlertService.getChildAlert(address);
-        return childInfoDTO
+        Optional<List<PersonChildAlertDTO>> personChildAlertDTOS = childAlertService.getChildAlert(address);
+        return personChildAlertDTOS
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -39,23 +34,30 @@ public class SpecificRequestController {
     // FireAddressInfo
     @GetMapping("/fire")
     public ResponseEntity<List<PersonFireAddressInfoDTO>> getFireAddressInfo(@RequestParam String address) throws Exception {
-        List<PersonFireAddressInfoDTO> personFireAddressInfoDTO = fireAddressInfoService.getFireAddressInfo(address);
-        return (personFireAddressInfoDTO.isEmpty()) ? ResponseEntity.notFound().build() : ResponseEntity.ok(personFireAddressInfoDTO);
+        List<PersonFireAddressInfoDTO> personFireAddressInfoDTOS = fireAddressInfoService.getFireAddressInfo(address);
+        return (personFireAddressInfoDTOS.isEmpty()) ? ResponseEntity.notFound().build() : ResponseEntity.ok(personFireAddressInfoDTOS);
     }
 
     // FireStationCoverage
     @GetMapping("/firestation")
     public ResponseEntity<FireStationCoverageResponseDTO> getFireStationCoverage(@RequestParam int stationNumber) throws Exception {
-        FireStationCoverageResponseDTO personsCovered = fireStationCoverageService.getFireStationCoverage(stationNumber);
-        return (personsCovered.getPersons().isEmpty()) ? ResponseEntity.notFound().build() : ResponseEntity.ok(personsCovered);
+        FireStationCoverageResponseDTO fireStationCoverageResponseDTO = fireStationCoverageService.getFireStationCoverage(stationNumber);
+        return (fireStationCoverageResponseDTO.getPersons().isEmpty()) ? ResponseEntity.notFound().build() : ResponseEntity.ok(fireStationCoverageResponseDTO);
     }
 
     // PhoneAlert
     @GetMapping("/phoneAlert")
     public ResponseEntity<List<PersonPhoneAlertDTO>> getPhoneAlert(@RequestParam(name = "firestation") int fireStationNumber) throws Exception {
-        Optional<List<PersonPhoneAlertDTO>> personPhoneDTO = phoneAlertService.getPhoneAlert(fireStationNumber);
-        return personPhoneDTO
+        Optional<List<PersonPhoneAlertDTO>> personPhoneAlertDTOS = phoneAlertService.getPhoneAlert(fireStationNumber);
+        return personPhoneAlertDTOS
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // CommunityEmail
+    @GetMapping("/communityEmail")
+    public ResponseEntity<List<PersonCommunityEmailDTO>> getCommunityEmail(@RequestParam String city) throws Exception {
+        List<PersonCommunityEmailDTO> personCommunityEmailDTOS = communityEmailService.getCommunityEmail(city);
+        return (personCommunityEmailDTOS.isEmpty()) ? ResponseEntity.notFound().build() : ResponseEntity.ok(personCommunityEmailDTOS);
     }
 }

@@ -11,4 +11,10 @@ public class PersonUtils {
                 .filter(person -> person.getAddress().equals(address))
                 .toList();
     }
+
+    public static List<Person> findPersonsByCity(List<Person> persons, String city) {
+        return persons.stream()
+                .filter(person -> person.getCity().equals(city))
+                .toList();
+    }
 }

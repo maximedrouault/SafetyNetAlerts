@@ -27,16 +27,16 @@ public class FireAddressInfoService {
         Optional<Integer> fireStationNumberForAddress = FireStationUtils.findFireStationNumberByAddress(dataContainer.getFirestations(), address);
 
         if (personsAtAddress.isEmpty() || fireStationNumberForAddress.isEmpty()) {
-            log.error("No persons or fire station number found for address '{}'.", address);
+            log.error("No Persons or Fire station number found for address : '{}'.", address);
             return List.of();
         }
 
-        List<PersonFireAddressInfoDTO> personsFireAddressInfoDTO = personsAtAddress.stream()
+        List<PersonFireAddressInfoDTO> personFireAddressInfoDTOS = personsAtAddress.stream()
             .map(person -> createPersonFireAddressInfoDTO(person, fireStationNumberForAddress, dataContainer))
             .toList();
 
-        log.info("Fire address info processed for address '{}'.", address);
-        return personsFireAddressInfoDTO;
+        log.info("Fire address info processed for address : '{}'.", address);
+        return personFireAddressInfoDTOS;
     }
 
 

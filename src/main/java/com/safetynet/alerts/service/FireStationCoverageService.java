@@ -69,7 +69,7 @@ public class FireStationCoverageService {
 
 
         // Step 6 : Create PersonFireStationCoverageDTO object
-        List<PersonFireStationCoverageDTO> personsFireStationCoverageDTO = coveredPersons.stream()
+        List<PersonFireStationCoverageDTO> personFireStationCoverageDTOS = coveredPersons.stream()
                 .map(person -> {
                     PersonFireStationCoverageDTO personFireStationCoverageDTO = new PersonFireStationCoverageDTO();
 
@@ -84,7 +84,7 @@ public class FireStationCoverageService {
 
         // Create the DTO response object with nested PersonFireStationCoverageDTO
         FireStationCoverageResponseDTO fireStationsCoverageResponseDTO = new FireStationCoverageResponseDTO();
-        fireStationsCoverageResponseDTO.setPersons(personsFireStationCoverageDTO);
+        fireStationsCoverageResponseDTO.setPersons(personFireStationCoverageDTOS);
         fireStationsCoverageResponseDTO.setAdultsCount((int) adultsCount);
         fireStationsCoverageResponseDTO.setChildrenCount((int) childrenCount);
 

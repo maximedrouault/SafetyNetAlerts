@@ -50,7 +50,7 @@ public class PhoneAlertService {
 
 
         // Step 5 : Return PersonPhoneAlertDTO object
-        List<PersonPhoneAlertDTO> personsPhoneAlertDTO = coveredPersons.stream()
+        List<PersonPhoneAlertDTO> personPhoneAlertDTOS = coveredPersons.stream()
                 .map(person -> {
                     PersonPhoneAlertDTO personPhoneAlertDTO = new PersonPhoneAlertDTO();
 
@@ -61,6 +61,6 @@ public class PhoneAlertService {
                 .toList();
 
         log.info("Phone alert for station number '{}' processed.", fireStationNumber);
-        return Optional.of(personsPhoneAlertDTO);
+        return Optional.of(personPhoneAlertDTOS);
     }
 }
