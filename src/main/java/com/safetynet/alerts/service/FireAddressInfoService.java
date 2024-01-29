@@ -27,7 +27,7 @@ public class FireAddressInfoService {
         Optional<Integer> fireStationNumberForAddress = FireStationUtils.findFireStationNumberByAddress(dataContainer.getFirestations(), address);
 
         if (personsAtAddress.isEmpty() || fireStationNumberForAddress.isEmpty()) {
-            log.error("No Persons or Fire station number found for address : '{}'.", address);
+            log.error("No Person or Fire station number found for address : '{}'.", address);
             return List.of();
         }
 

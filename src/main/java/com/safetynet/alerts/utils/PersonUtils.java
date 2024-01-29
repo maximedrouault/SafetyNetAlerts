@@ -17,4 +17,10 @@ public class PersonUtils {
                 .filter(person -> person.getCity().equals(city))
                 .toList();
     }
+
+    public static List<Person> findPersonsByFirstNameAndLastName(List<Person> persons, String firstName, String lastName) {
+        return persons.stream()
+                .filter(person -> person.getFirstName().equals(firstName) && person.getLastName().equals(lastName))
+                .toList();
+    }
 }

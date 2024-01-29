@@ -23,7 +23,7 @@ public class CommunityEmailService {
         List<Person> personsAtCity = PersonUtils.findPersonsByCity(dataContainer.getPersons(), city);
 
         if (personsAtCity.isEmpty()) {
-            log.error("No Persons found for city : '{}'.", city);
+            log.error("No Person found for city : '{}'.", city);
             return List.of();
         }
 

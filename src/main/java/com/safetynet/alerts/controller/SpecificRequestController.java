@@ -20,6 +20,7 @@ public class SpecificRequestController {
     private final FireStationCoverageService fireStationCoverageService;
     private final PhoneAlertService phoneAlertService;
     private final CommunityEmailService communityEmailService;
+    private final PersonInfoService personInfoService;
 
 
     // ChildAlert
@@ -59,5 +60,12 @@ public class SpecificRequestController {
     public ResponseEntity<List<PersonCommunityEmailDTO>> getCommunityEmail(@RequestParam String city) throws Exception {
         List<PersonCommunityEmailDTO> personCommunityEmailDTOS = communityEmailService.getCommunityEmail(city);
         return (personCommunityEmailDTOS.isEmpty()) ? ResponseEntity.notFound().build() : ResponseEntity.ok(personCommunityEmailDTOS);
+    }
+
+    // PersonInfo
+    @GetMapping("/personInfo")
+    public ResponseEntity<List<PersonInfoDTO>> getPersonInfo(@RequestParam String firstName, String lastName) throws Exception {
+        List<PersonInfoDTO> personInfoDTOS = personInfoService.getPersonInfo(firstName, lastName);
+        return (personInfoDTOS.isEmpty()) ? ResponseEntity.notFound().build() : ResponseEntity.ok(personInfoDTOS);
     }
 }
