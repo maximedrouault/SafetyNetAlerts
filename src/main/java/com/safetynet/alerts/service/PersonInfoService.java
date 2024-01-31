@@ -2,7 +2,6 @@ package com.safetynet.alerts.service;
 
 import com.safetynet.alerts.dto.PersonInfoDTO;
 import com.safetynet.alerts.model.DataContainer;
-import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.utils.MedicalRecordUtils;
 import com.safetynet.alerts.utils.PersonUtils;
@@ -11,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -46,15 +44,7 @@ public class PersonInfoService {
         personInfoDTO.setAddress(person.getAddress());
         personInfoDTO.setEmail(person.getEmail());
 
-        Optional<MedicalRecord> medicalRecordForPerson = MedicalRecordUtils.findMedicalRecordForPerson(person, dataContainer.getMedicalrecords());
-
-        medicalRecordForPerson.ifPresent(medicalRecord -> {
-            personInfoDTO.setMedications(medicalRecord.getMedications());
-            personInfoDTO.setAllergies(medicalRecord.getAllergies());
-
-            int ageOfPerson = MedicalRecordUtils.findAgeByBirthdate(medicalRecord);
-            personInfoDTO.setAge(ageOfPerson);
-        });
+        MedicalRecordUtils.setCommonMedicalInfo(personInfoDTO, person, dataContainer.getMedicalrecords());
 
         return personInfoDTO;
     }

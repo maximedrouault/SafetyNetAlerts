@@ -1,8 +1,8 @@
 package com.safetynet.alerts.utils;
 
+import com.safetynet.alerts.interfaces.CommonMedicalInfo;
 import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.model.Person;
-
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
@@ -26,5 +26,17 @@ public class MedicalRecordUtils {
         Period period = Period.between(birthdate, currentDate);
 
         return period.getYears();
+    }
+
+    public static void setCommonMedicalInfo(CommonMedicalInfo commonMedicalInfo, Person person, List<MedicalRecord> medicalRecords) {
+        Optional<MedicalRecord> medicalRecordForPerson = findMedicalRecordForPerson(person, medicalRecords);
+
+        medicalRecordForPerson.ifPresent(medicalRecord -> {
+            commonMedicalInfo.setMedications(medicalRecord.getMedications());
+            commonMedicalInfo.setAllergies(medicalRecord.getAllergies());
+
+            int ageOfPerson = findAgeByBirthdate(medicalRecord);
+            commonMedicalInfo.setAge(ageOfPerson);
+        });
     }
 }

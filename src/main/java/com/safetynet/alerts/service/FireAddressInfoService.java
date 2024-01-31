@@ -2,7 +2,6 @@ package com.safetynet.alerts.service;
 
 import com.safetynet.alerts.dto.PersonFireAddressInfoDTO;
 import com.safetynet.alerts.model.DataContainer;
-import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.utils.FireStationUtils;
 import com.safetynet.alerts.utils.MedicalRecordUtils;
@@ -47,15 +46,7 @@ public class FireAddressInfoService {
         personFireAddressInfoDTO.setPhone(person.getPhone());
         fireStationNumberForAddress.ifPresent(personFireAddressInfoDTO::setStationNumber);
 
-        Optional<MedicalRecord> medicalRecordForPerson = MedicalRecordUtils.findMedicalRecordForPerson(person, dataContainer.getMedicalrecords());
-
-        medicalRecordForPerson.ifPresent(medicalRecord -> {
-            personFireAddressInfoDTO.setMedications(medicalRecord.getMedications());
-            personFireAddressInfoDTO.setAllergies(medicalRecord.getAllergies());
-
-            int ageOfPerson = MedicalRecordUtils.findAgeByBirthdate(medicalRecord);
-            personFireAddressInfoDTO.setAge(ageOfPerson);
-        });
+        MedicalRecordUtils.setCommonMedicalInfo(personFireAddressInfoDTO, person, dataContainer.getMedicalrecords());
 
         return personFireAddressInfoDTO;
     }

@@ -3,7 +3,6 @@ package com.safetynet.alerts.service;
 import com.safetynet.alerts.dto.FloodStationCoverageResponseDTO;
 import com.safetynet.alerts.dto.PersonFloodStationCoverageDTO;
 import com.safetynet.alerts.model.DataContainer;
-import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.utils.FireStationUtils;
 import com.safetynet.alerts.utils.MedicalRecordUtils;
@@ -13,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,15 +65,7 @@ public class FloodStationCoverageService {
         personFloodStationCoverageDTO.setLastName(person.getLastName());
         personFloodStationCoverageDTO.setPhone(person.getPhone());
 
-        Optional<MedicalRecord> medicalRecordForPerson = MedicalRecordUtils.findMedicalRecordForPerson(person, dataContainer.getMedicalrecords());
-
-        medicalRecordForPerson.ifPresent(medicalRecord -> {
-            personFloodStationCoverageDTO.setMedications(medicalRecord.getMedications());
-            personFloodStationCoverageDTO.setAllergies(medicalRecord.getAllergies());
-
-            int ageOfPerson = MedicalRecordUtils.findAgeByBirthdate(medicalRecord);
-            personFloodStationCoverageDTO.setAge(ageOfPerson);
-        });
+        MedicalRecordUtils.setCommonMedicalInfo(personFloodStationCoverageDTO, person, dataContainer.getMedicalrecords());
 
         return personFloodStationCoverageDTO;
     }
