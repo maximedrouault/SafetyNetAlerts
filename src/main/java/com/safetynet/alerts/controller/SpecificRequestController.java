@@ -21,6 +21,7 @@ public class SpecificRequestController {
     private final PhoneAlertService phoneAlertService;
     private final CommunityEmailService communityEmailService;
     private final PersonInfoService personInfoService;
+    private final FloodStationCoverageService floodStationCoverageService;
 
 
     // ChildAlert
@@ -67,5 +68,12 @@ public class SpecificRequestController {
     public ResponseEntity<List<PersonInfoDTO>> getPersonInfo(@RequestParam String firstName, String lastName) throws Exception {
         List<PersonInfoDTO> personInfoDTOS = personInfoService.getPersonInfo(firstName, lastName);
         return (personInfoDTOS.isEmpty()) ? ResponseEntity.notFound().build() : ResponseEntity.ok(personInfoDTOS);
+    }
+
+    // FloodStationCoverage
+    @GetMapping("/flood")
+    public ResponseEntity<List<FloodStationCoverageResponseDTO>> getFloodStationCoverage(@RequestParam(name = "stations") List<Integer> stationNumbers) throws Exception {
+        List<FloodStationCoverageResponseDTO> floodStationCoverageResponseDTOS = floodStationCoverageService.getFloodStationCoverage(stationNumbers);
+        return (floodStationCoverageResponseDTOS.isEmpty()) ? ResponseEntity.notFound().build() : ResponseEntity.ok(floodStationCoverageResponseDTOS);
     }
 }

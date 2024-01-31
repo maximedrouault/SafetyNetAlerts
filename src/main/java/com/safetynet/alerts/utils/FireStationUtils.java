@@ -11,8 +11,15 @@ public class FireStationUtils {
     public static Optional<Integer> findFireStationNumberByAddress(List<FireStation> fireStations, String address) {
         return fireStations.stream()
                 .filter(fireStation -> fireStation.getAddress().equals(address))
-                .findFirst()
-                .map(FireStation::getStation);
+                .map(FireStation::getStation)
+                .findFirst();
+    }
+
+    public static List<String> findFireStationAddressByNumbers(List<FireStation> fireStations, List<Integer> stationNumbers) {
+        return fireStations.stream()
+                .filter(fireStation -> stationNumbers.contains(fireStation.getStation()))
+                .map(FireStation::getAddress)
+                .toList();
     }
 
 }

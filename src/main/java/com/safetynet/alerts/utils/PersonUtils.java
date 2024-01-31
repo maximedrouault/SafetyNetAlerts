@@ -23,4 +23,10 @@ public class PersonUtils {
                 .filter(person -> person.getFirstName().equals(firstName) && person.getLastName().equals(lastName))
                 .toList();
     }
+
+    public static List<Person> findPersonsByAddresses(List<Person> persons, List<String> addresses) {
+        return persons.stream()
+                .filter(person -> addresses.contains(person.getAddress()))
+                .toList();
+    }
 }
