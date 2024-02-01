@@ -7,9 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
-import java.util.Optional;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -48,10 +47,8 @@ public class SpecificRequestController {
     // PhoneAlert
     @GetMapping("/phoneAlert")
     public ResponseEntity<List<PersonPhoneAlertDTO>> getPhoneAlert(@RequestParam(name = "firestation") int fireStationNumber) throws Exception {
-        Optional<List<PersonPhoneAlertDTO>> personPhoneAlertDTOS = phoneAlertService.getPhoneAlert(fireStationNumber);
-        return personPhoneAlertDTOS
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        List<PersonPhoneAlertDTO> personPhoneAlertDTOS = phoneAlertService.getPhoneAlert(fireStationNumber);
+        return (personPhoneAlertDTOS.isEmpty()) ? ResponseEntity.notFound().build() : ResponseEntity.ok(personPhoneAlertDTOS);
     }
 
     // CommunityEmail
