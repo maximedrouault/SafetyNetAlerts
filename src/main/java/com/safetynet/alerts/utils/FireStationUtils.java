@@ -22,4 +22,10 @@ public class FireStationUtils {
                 .toList();
     }
 
+    public static List<String> findFireStationAddressByNumber(List<FireStation> fireStations, int stationNumber) {
+        return fireStations.stream()
+                .filter(fireStation -> stationNumber == fireStation.getStation())
+                .map(FireStation::getAddress)
+                .toList();
+    }
 }

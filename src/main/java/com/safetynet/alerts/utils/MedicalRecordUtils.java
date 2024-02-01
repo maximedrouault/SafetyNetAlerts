@@ -39,4 +39,30 @@ public class MedicalRecordUtils {
             commonMedicalInfo.setAge(ageOfPerson);
         });
     }
+
+    public static long countAdults(List<Person> persons, List<MedicalRecord> medicalRecords) {
+        List<Integer> ages = persons.stream()
+                .map(person -> MedicalRecordUtils.findMedicalRecordForPerson(person, medicalRecords))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(MedicalRecordUtils::findAgeByBirthdate)
+                .toList();
+
+        return ages.stream()
+                .filter(age -> age > 18)
+                .count();
+    }
+
+    public static long countChildren(List<Person> persons, List<MedicalRecord> medicalRecords) {
+        List<Integer> ages = persons.stream()
+                .map(person -> MedicalRecordUtils.findMedicalRecordForPerson(person, medicalRecords))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(MedicalRecordUtils::findAgeByBirthdate)
+                .toList();
+
+        return ages.stream()
+                .filter(age -> age <= 18)
+                .count();
+    }
 }

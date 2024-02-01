@@ -52,6 +52,7 @@ public class FloodStationCoverageService {
 
     private FloodStationCoverageResponseDTO createFloodStationCoverageResponseDTO(String address, List<PersonFloodStationCoverageDTO> persons) {
         FloodStationCoverageResponseDTO floodStationCoverageResponseDTO = new FloodStationCoverageResponseDTO();
+
         floodStationCoverageResponseDTO.setAddress(address);
         floodStationCoverageResponseDTO.setPersons(persons);
 
