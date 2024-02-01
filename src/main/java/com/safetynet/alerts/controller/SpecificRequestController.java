@@ -27,10 +27,8 @@ public class SpecificRequestController {
     // ChildAlert
     @GetMapping("/childAlert")
     public ResponseEntity<List<PersonChildAlertDTO>> getChildAlert(@RequestParam String address) throws Exception {
-        Optional<List<PersonChildAlertDTO>> personChildAlertDTOS = childAlertService.getChildAlert(address);
-        return personChildAlertDTOS
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        List<PersonChildAlertDTO> personChildAlertDTOS = childAlertService.getChildAlert(address);
+        return (personChildAlertDTOS.isEmpty()) ? ResponseEntity.notFound().build() : ResponseEntity.ok(personChildAlertDTOS);
     }
 
     // FireAddressInfo

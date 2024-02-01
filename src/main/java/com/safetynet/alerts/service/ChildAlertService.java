@@ -4,12 +4,12 @@ import com.safetynet.alerts.dto.PersonChildAlertDTO;
 import com.safetynet.alerts.model.DataContainer;
 import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.model.Person;
+import com.safetynet.alerts.utils.MedicalRecordUtils;
+import com.safetynet.alerts.utils.PersonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.format.DateTimeFormatter;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -21,83 +21,41 @@ public class ChildAlertService {
 
     private final DataReader dataReader;
 
-    public Optional<List<PersonChildAlertDTO>> getChildAlert(String address) throws Exception {
+    public List<PersonChildAlertDTO> getChildAlert(String address) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
-        List<Person> persons = dataContainer.getPersons();
-        List<MedicalRecord> medicalRecords = dataContainer.getMedicalrecords();
-
-
-        // Step 1 : Get a list of Persons living at the given address
-        List<Person> personsAtAddress = persons.stream()
-                .filter(person -> person.getAddress().equals(address))
-                .toList();
+        List<Person> personsAtAddress = PersonUtils.findPersonsByAddress(dataContainer.getPersons(), address);
 
         if (personsAtAddress.isEmpty()) {
             log.error("No person found at address : {}", address);
-            return Optional.empty();
+            return List.of();
         }
 
+        List<Person> children = MedicalRecordUtils.findChildren(personsAtAddress, dataContainer.getMedicalrecords());
 
-        // Step 2: Find children based on birthdate
-        List<Person> children = personsAtAddress.stream()
-                .filter(person -> {
-                    Optional<MedicalRecord> personMedicalRecord = medicalRecords.stream()
-                            .filter(medicalRecord -> medicalRecord.getFirstName().equals(person.getFirstName()) &&
-                                    medicalRecord.getLastName().equals(person.getLastName()))
-                            .findFirst();
-
-                    if (personMedicalRecord.isPresent()) {
-
-                        LocalDate birthdate = LocalDate.parse(personMedicalRecord.get().getBirthdate(), DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                        int age = Period.between(birthdate, LocalDate.now()).getYears();
-                        return age <= 18;
-                    } else {
-                        return false;
-                    }
-                })
+        List<PersonChildAlertDTO> personChildAlertDTOS = children.stream()
+                .map(person -> createPersonChildAlertDTO(person, dataContainer.getMedicalrecords(), personsAtAddress))
                 .toList();
-
-
-        // Step 3 : Return PersonChildAlertDTO object
-        List<PersonChildAlertDTO> personsChildAlertDTO = children.stream()
-                .map(child -> {
-                    PersonChildAlertDTO personChildAlertDTO = new PersonChildAlertDTO();
-
-                    personChildAlertDTO.setFirstName(child.getFirstName());
-                    personChildAlertDTO.setLastName(child.getLastName());
-
-                    // Calculate age and set it in the DTO
-                    Optional<MedicalRecord> childMedicalRecord = medicalRecords.stream()
-                            .filter(medicalRecord ->
-                                    medicalRecord.getFirstName().equals(child.getFirstName()) &&
-                                    medicalRecord.getLastName().equals(child.getLastName()))
-                            .findFirst();
-
-                    if (childMedicalRecord.isPresent()) {
-                        LocalDate birthdate = LocalDate.parse(childMedicalRecord.get().getBirthdate(), DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                        int age = Period.between(birthdate, LocalDate.now()).getYears();
-
-                        personChildAlertDTO.setAge(age);
-                    }
-
-                    // Add member of family in the DTO
-                    List<Person> familyMember = persons.stream()
-                            .filter(person ->
-                                    !person.getFirstName().equals(child.getFirstName()) &&
-                                    person.getLastName().equals(child.getLastName()) &&
-                                    person.getAddress().equals(child.getAddress()))
-                            .toList();
-
-                    if (!familyMember.isEmpty()) {
-                        personChildAlertDTO.setFamilyMembers(familyMember);
-                    }
-
-                    return personChildAlertDTO;
-                })
-                .toList();
-
 
         log.info("Child alert processed for address '{}'.", address);
-        return Optional.of(personsChildAlertDTO);
+        return personChildAlertDTOS;
+    }
+
+
+    private PersonChildAlertDTO createPersonChildAlertDTO(Person person, List<MedicalRecord> medicalrecords, List<Person> persons) {
+        PersonChildAlertDTO personChildAlertDTO = new PersonChildAlertDTO();
+
+        personChildAlertDTO.setFirstName(person.getFirstName());
+        personChildAlertDTO.setLastName(person.getLastName());
+
+        Optional<MedicalRecord> medicalRecordForPerson = MedicalRecordUtils.findMedicalRecordForPerson(person, medicalrecords);
+        medicalRecordForPerson.ifPresent(medicalRecord -> {
+            int ageForPerson = MedicalRecordUtils.findAgeByBirthdate(medicalRecord);
+            personChildAlertDTO.setAge(ageForPerson);
+        });
+
+        List<Person> familyMembers = MedicalRecordUtils.findFamilyMembers(persons, person);
+        personChildAlertDTO.setFamilyMembers(familyMembers);
+
+        return personChildAlertDTO;
     }
 }

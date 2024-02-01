@@ -13,6 +13,7 @@ import java.util.Optional;
 public class MedicalRecordUtils {
 
     public static Optional<MedicalRecord> findMedicalRecordForPerson(Person person, List<MedicalRecord> medicalRecords) {
+
         return medicalRecords.stream()
                 .filter(medicalRecord ->
                         medicalRecord.getFirstName().equals(person.getFirstName()) &&
@@ -64,5 +65,23 @@ public class MedicalRecordUtils {
         return ages.stream()
                 .filter(age -> age <= 18)
                 .count();
+    }
+
+    public static List<Person> findChildren(List<Person> persons, List<MedicalRecord> medicalRecords) {
+
+        return persons.stream()
+                .filter(person -> MedicalRecordUtils.findMedicalRecordForPerson(person, medicalRecords)
+                        .map(medicalRecord -> MedicalRecordUtils.findAgeByBirthdate(medicalRecord) <= 18)
+                        .orElse(false))
+                .toList();
+    }
+
+    public static List<Person> findFamilyMembers(List<Person> persons, Person child) {
+
+        return persons.stream()
+                .filter(person -> person.getAddress().equals(child.getAddress()) &&
+                                person.getLastName().equals(child.getLastName()))
+                .filter(person -> !person.getFirstName().equals(child.getFirstName()))
+                .toList();
     }
 }
