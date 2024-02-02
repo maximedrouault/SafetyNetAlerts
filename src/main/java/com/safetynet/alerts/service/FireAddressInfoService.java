@@ -2,6 +2,7 @@ package com.safetynet.alerts.service;
 
 import com.safetynet.alerts.dto.PersonFireAddressInfoDTO;
 import com.safetynet.alerts.model.DataContainer;
+import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.utils.FireStationUtils;
 import com.safetynet.alerts.utils.MedicalRecordUtils;
@@ -19,11 +20,15 @@ import java.util.Optional;
 public class FireAddressInfoService {
 
     private final DataReader dataReader;
+    private final PersonUtils personUtils;
+    private final MedicalRecordUtils medicalRecordUtils;
+    private final FireStationUtils fireStationUtils;
+
 
     public List<PersonFireAddressInfoDTO> getFireAddressInfo(String address) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
-        List<Person> personsAtAddress = PersonUtils.findPersonsByAddress(dataContainer.getPersons(), address);
-        Optional<Integer> fireStationNumberForAddress = FireStationUtils.findFireStationNumberByAddress(dataContainer.getFirestations(), address);
+        List<Person> personsAtAddress = personUtils.getCoveredPersons(dataContainer.getPersons(), address);
+        Optional<Integer> fireStationNumberForAddress = fireStationUtils.findFireStationNumberByAddress(dataContainer.getFirestations(), address);
 
         if (personsAtAddress.isEmpty() || fireStationNumberForAddress.isEmpty()) {
             log.error("No Person or Fire station number found for address : '{}'.", address);
@@ -31,7 +36,7 @@ public class FireAddressInfoService {
         }
 
         List<PersonFireAddressInfoDTO> personFireAddressInfoDTOS = personsAtAddress.stream()
-            .map(person -> createPersonFireAddressInfoDTO(person, fireStationNumberForAddress, dataContainer))
+            .map(person -> createPersonFireAddressInfoDTO(person, fireStationNumberForAddress, dataContainer.getMedicalrecords()))
             .toList();
 
         log.info("Fire address info processed for address : '{}'.", address);
@@ -39,14 +44,14 @@ public class FireAddressInfoService {
     }
 
 
-    private PersonFireAddressInfoDTO createPersonFireAddressInfoDTO(Person person, Optional<Integer> fireStationNumberForAddress, DataContainer dataContainer) {
+    private PersonFireAddressInfoDTO createPersonFireAddressInfoDTO(Person person, Optional<Integer> fireStationNumberForAddress, List<MedicalRecord> medicalRecords) {
         PersonFireAddressInfoDTO personFireAddressInfoDTO = new  PersonFireAddressInfoDTO();
 
         personFireAddressInfoDTO.setLastName(person.getLastName());
         personFireAddressInfoDTO.setPhone(person.getPhone());
         fireStationNumberForAddress.ifPresent(personFireAddressInfoDTO::setStationNumber);
 
-        MedicalRecordUtils.setCommonMedicalInfo(personFireAddressInfoDTO, person, dataContainer.getMedicalrecords());
+        medicalRecordUtils.setCommonMedicalInfo(personFireAddressInfoDTO, person, medicalRecords);
 
         return personFireAddressInfoDTO;
     }

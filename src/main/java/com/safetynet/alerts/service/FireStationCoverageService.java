@@ -19,19 +19,23 @@ import java.util.*;
 public class FireStationCoverageService {
 
     private final DataReader dataReader;
+    private final MedicalRecordUtils medicalRecordUtils;
+    private final PersonUtils personUtils;
+    private final FireStationUtils fireStationUtils;
+
 
     public FireStationCoverageResponseDTO getFireStationCoverage(int stationNumber) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
-        List<String> fireStationAddressForNumber = FireStationUtils.findFireStationAddressByNumber(dataContainer.getFirestations(), stationNumber);
-        List<Person> personsAtAddress = PersonUtils.findPersonsByAddresses(dataContainer.getPersons(), fireStationAddressForNumber);
+        List<String> fireStationAddressForNumber = fireStationUtils.findFireStationAddressByNumber(dataContainer.getFirestations(), stationNumber);
+        List<Person> personsAtAddress = personUtils.findPersonsByAddresses(dataContainer.getPersons(), fireStationAddressForNumber);
 
         if (fireStationAddressForNumber.isEmpty() || personsAtAddress.isEmpty()) {
             log.error("No Fire station or person found for station number : '{}'.", stationNumber);
             return createFireStationCoverageResponseDTO(Collections.emptyList(), 0, 0);
         }
 
-        long adultsCount = MedicalRecordUtils.countAdults(personsAtAddress, dataContainer.getMedicalrecords());
-        long childrenCount = MedicalRecordUtils.countChildren(personsAtAddress, dataContainer.getMedicalrecords());
+        long adultsCount = medicalRecordUtils.countAdults(personsAtAddress, dataContainer.getMedicalrecords());
+        long childrenCount = medicalRecordUtils.countChildren(personsAtAddress, dataContainer.getMedicalrecords());
 
         List<PersonFireStationCoverageDTO> personFireStationCoverageDTOS = personsAtAddress.stream()
                 .map(this::createPersonFireStationCoverageDTO)

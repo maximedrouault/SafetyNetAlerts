@@ -17,10 +17,11 @@ import java.util.List;
 public class CommunityEmailService {
 
     private final DataReader dataReader;
+    private final PersonUtils personUtils;
 
     public List<PersonCommunityEmailDTO> getCommunityEmail(String city) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
-        List<Person> personsAtCity = PersonUtils.findPersonsByCity(dataContainer.getPersons(), city);
+        List<Person> personsAtCity = personUtils.findPersonsByCity(dataContainer.getPersons(), city);
 
         if (personsAtCity.isEmpty()) {
             log.error("No Person found for city : '{}'.", city);

@@ -17,11 +17,14 @@ import java.util.List;
 public class PhoneAlertService {
 
     private final DataReader dataReader;
+    private final PersonUtils personUtils;
+    private final FireStationUtils fireStationUtils;
+
 
     public List<PersonPhoneAlertDTO> getPhoneAlert(int fireStationNumber) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
-        List<String> fireStationAddressForNumber = FireStationUtils.findFireStationAddressByNumber(dataContainer.getFirestations(), fireStationNumber);
-        List<Person> personsAtAddress = PersonUtils.findPersonsByAddresses(dataContainer.getPersons(), fireStationAddressForNumber);
+        List<String> fireStationAddressForNumber = fireStationUtils.findFireStationAddressByNumber(dataContainer.getFirestations(), fireStationNumber);
+        List<Person> personsAtAddress = personUtils.findPersonsByAddresses(dataContainer.getPersons(), fireStationAddressForNumber);
 
         if (fireStationAddressForNumber.isEmpty() || personsAtAddress.isEmpty()) {
             log.error("No address or person covered by station number {}", fireStationNumber);

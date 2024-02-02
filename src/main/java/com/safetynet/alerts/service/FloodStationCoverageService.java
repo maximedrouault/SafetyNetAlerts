@@ -20,11 +20,15 @@ import java.util.stream.Collectors;
 public class FloodStationCoverageService {
 
     private final DataReader dataReader;
+    private final MedicalRecordUtils medicalRecordUtils;
+    private final PersonUtils personUtils;
+    private final FireStationUtils fireStationUtils;
+
 
     public List<FloodStationCoverageResponseDTO> getFloodStationCoverage(List<Integer> stationNumbers) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
-        List<String> fireStationAddressForNumbers = FireStationUtils.findFireStationAddressByNumbers(dataContainer.getFirestations(), stationNumbers);
-        List<Person> personsAtAddress = PersonUtils.findPersonsByAddresses(dataContainer.getPersons(), fireStationAddressForNumbers);
+        List<String> fireStationAddressForNumbers = fireStationUtils.findFireStationAddressByNumbers(dataContainer.getFirestations(), stationNumbers);
+        List<Person> personsAtAddress = personUtils.findPersonsByAddresses(dataContainer.getPersons(), fireStationAddressForNumbers);
 
         if (fireStationAddressForNumbers.isEmpty() || personsAtAddress.isEmpty()) {
             log.error("No Fire station or person found for station numbers : '{}'.", stationNumbers);
@@ -66,7 +70,7 @@ public class FloodStationCoverageService {
         personFloodStationCoverageDTO.setLastName(person.getLastName());
         personFloodStationCoverageDTO.setPhone(person.getPhone());
 
-        MedicalRecordUtils.setCommonMedicalInfo(personFloodStationCoverageDTO, person, dataContainer.getMedicalrecords());
+        medicalRecordUtils.setCommonMedicalInfo(personFloodStationCoverageDTO, person, dataContainer.getMedicalrecords());
 
         return personFloodStationCoverageDTO;
     }

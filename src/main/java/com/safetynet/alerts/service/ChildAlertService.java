@@ -10,8 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -20,20 +19,30 @@ import java.util.Optional;
 public class ChildAlertService {
 
     private final DataReader dataReader;
+    private final PersonUtils personUtils;
+    private final MedicalRecordUtils medicalRecordUtils;
+
 
     public List<PersonChildAlertDTO> getChildAlert(String address) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
-        List<Person> personsAtAddress = PersonUtils.findPersonsByAddress(dataContainer.getPersons(), address);
+        List<Person> coveredPersons = personUtils.getCoveredPersons(dataContainer.getPersons(), address);
 
-        if (personsAtAddress.isEmpty()) {
+        if (coveredPersons.isEmpty()) {
             log.error("No person found at address : {}", address);
             return List.of();
         }
 
-        List<Person> children = MedicalRecordUtils.findChildren(personsAtAddress, dataContainer.getMedicalrecords());
+        Map<Person, MedicalRecord> personToMedicalRecordMap = medicalRecordUtils.createPersonToMedicalRecordMap(coveredPersons, dataContainer.getMedicalrecords());
+
+        List<Person> children = medicalRecordUtils.getChildren(personToMedicalRecordMap);
 
         List<PersonChildAlertDTO> personChildAlertDTOS = children.stream()
-                .map(person -> createPersonChildAlertDTO(person, dataContainer.getMedicalrecords(), personsAtAddress))
+                .map(child -> {
+                    String birthdate = personToMedicalRecordMap.get(child).getBirthdate();
+                    int age = medicalRecordUtils.getAge(birthdate);
+                    List<Person> familyMembers = medicalRecordUtils.getFamilyMembers(coveredPersons, child);
+                    return createPersonChildAlertDTO(child, age, familyMembers);
+                })
                 .toList();
 
         log.info("Child alert processed for address '{}'.", address);
@@ -41,19 +50,12 @@ public class ChildAlertService {
     }
 
 
-    private PersonChildAlertDTO createPersonChildAlertDTO(Person person, List<MedicalRecord> medicalrecords, List<Person> persons) {
+    private PersonChildAlertDTO createPersonChildAlertDTO(Person child, int age, List<Person> familyMembers) {
         PersonChildAlertDTO personChildAlertDTO = new PersonChildAlertDTO();
 
-        personChildAlertDTO.setFirstName(person.getFirstName());
-        personChildAlertDTO.setLastName(person.getLastName());
-
-        Optional<MedicalRecord> medicalRecordForPerson = MedicalRecordUtils.findMedicalRecordForPerson(person, medicalrecords);
-        medicalRecordForPerson.ifPresent(medicalRecord -> {
-            int ageForPerson = MedicalRecordUtils.findAgeByBirthdate(medicalRecord);
-            personChildAlertDTO.setAge(ageForPerson);
-        });
-
-        List<Person> familyMembers = MedicalRecordUtils.findFamilyMembers(persons, person);
+        personChildAlertDTO.setFirstName(child.getFirstName());
+        personChildAlertDTO.setLastName(child.getLastName());
+        personChildAlertDTO.setAge(age);
         personChildAlertDTO.setFamilyMembers(familyMembers);
 
         return personChildAlertDTO;

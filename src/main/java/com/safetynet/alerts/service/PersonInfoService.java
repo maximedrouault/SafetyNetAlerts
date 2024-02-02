@@ -18,10 +18,12 @@ import java.util.List;
 public class PersonInfoService {
 
     private final DataReader dataReader;
+    private final MedicalRecordUtils medicalRecordUtils;
+    private final PersonUtils personUtils;
 
     public List<PersonInfoDTO> getPersonInfo(String firstName, String lastName) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
-        List<Person> personsFiltered = PersonUtils.findPersonsByFirstNameAndLastName(dataContainer.getPersons(), firstName, lastName);
+        List<Person> personsFiltered = personUtils.findPersonsByFirstNameAndLastName(dataContainer.getPersons(), firstName, lastName);
 
         if (personsFiltered.isEmpty()) {
             log.error("No Person found for First name : '{}' and Last name : '{}'.", firstName, lastName);
@@ -44,7 +46,7 @@ public class PersonInfoService {
         personInfoDTO.setAddress(person.getAddress());
         personInfoDTO.setEmail(person.getEmail());
 
-        MedicalRecordUtils.setCommonMedicalInfo(personInfoDTO, person, dataContainer.getMedicalrecords());
+        medicalRecordUtils.setCommonMedicalInfo(personInfoDTO, person, dataContainer.getMedicalrecords());
 
         return personInfoDTO;
     }
