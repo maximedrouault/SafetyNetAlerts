@@ -59,24 +59,21 @@ public class FloodStationCoverageService {
 
 
     private FloodStationCoverageResponseDTO createFloodStationCoverageResponseDTO(String address, List<PersonFloodStationCoverageDTO> persons) {
-        FloodStationCoverageResponseDTO floodStationCoverageResponseDTO = new FloodStationCoverageResponseDTO();
 
-        floodStationCoverageResponseDTO.setAddress(address);
-        floodStationCoverageResponseDTO.setPersons(persons);
-
-        return floodStationCoverageResponseDTO;
+        return FloodStationCoverageResponseDTO.builder()
+                .address(address)
+                .persons(persons)
+                .build();
     }
 
-
     private PersonFloodStationCoverageDTO createPersonFloodStationCoverageDTO(Person person, int age, MedicalRecord medicalRecord) {
-        PersonFloodStationCoverageDTO personFloodStationCoverageDTO = new PersonFloodStationCoverageDTO();
 
-        personFloodStationCoverageDTO.setLastName(person.getLastName());
-        personFloodStationCoverageDTO.setPhone(person.getPhone());
-        personFloodStationCoverageDTO.setAge(age);
-        personFloodStationCoverageDTO.setMedications(medicalRecord.getMedications());
-        personFloodStationCoverageDTO.setAllergies(medicalRecord.getAllergies());
-
-        return personFloodStationCoverageDTO;
+        return PersonFloodStationCoverageDTO.builder()
+                .lastName(person.getLastName())
+                .phone(person.getPhone())
+                .age(age)
+                .medications(medicalRecord.getMedications())
+                .allergies(medicalRecord.getAllergies())
+                .build();
     }
 }

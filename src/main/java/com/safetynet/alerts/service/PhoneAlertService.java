@@ -41,10 +41,9 @@ public class PhoneAlertService {
 
 
     private PersonPhoneAlertDTO createPersonPhoneAlertDTO(Person person) {
-        PersonPhoneAlertDTO personPhoneAlertDTO = new PersonPhoneAlertDTO();
 
-        personPhoneAlertDTO.setPhone(person.getPhone());
-
-        return personPhoneAlertDTO;
+        return PersonPhoneAlertDTO.builder()
+                .phone(person.getPhone())
+                .build();
     }
 }

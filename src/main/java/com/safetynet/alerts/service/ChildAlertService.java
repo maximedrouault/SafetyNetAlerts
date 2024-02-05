@@ -51,13 +51,12 @@ public class ChildAlertService {
 
 
     private PersonChildAlertDTO createPersonChildAlertDTO(Person child, int age, List<Person> familyMembers) {
-        PersonChildAlertDTO personChildAlertDTO = new PersonChildAlertDTO();
 
-        personChildAlertDTO.setFirstName(child.getFirstName());
-        personChildAlertDTO.setLastName(child.getLastName());
-        personChildAlertDTO.setAge(age);
-        personChildAlertDTO.setFamilyMembers(familyMembers);
-
-        return personChildAlertDTO;
+        return PersonChildAlertDTO.builder()
+                .firstName(child.getFirstName())
+                .lastName(child.getLastName())
+                .age(age)
+                .familyMembers(familyMembers)
+                .build();
     }
 }

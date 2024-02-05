@@ -38,10 +38,9 @@ public class CommunityEmailService {
 
 
     private PersonCommunityEmailDTO createPersonCommunityEmailDTO(Person person) {
-        PersonCommunityEmailDTO personCommunityEmailDTO = new PersonCommunityEmailDTO();
 
-        personCommunityEmailDTO.setEmail(person.getEmail());
-
-        return personCommunityEmailDTO;
+        return PersonCommunityEmailDTO.builder()
+                .email(person.getEmail())
+                .build();
     }
 }

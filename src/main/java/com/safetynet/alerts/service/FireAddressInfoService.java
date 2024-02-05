@@ -55,24 +55,21 @@ public class FireAddressInfoService {
 
 
     private PersonFireAddressInfoDTO createPersonFireAddressInfoDTO(Person person, int age, MedicalRecord medicalRecord) {
-        PersonFireAddressInfoDTO personFireAddressInfoDTO = new  PersonFireAddressInfoDTO();
 
-        personFireAddressInfoDTO.setLastName(person.getLastName());
-        personFireAddressInfoDTO.setPhone(person.getPhone());
-        personFireAddressInfoDTO.setMedications(medicalRecord.getMedications());
-        personFireAddressInfoDTO.setAllergies(medicalRecord.getAllergies());
-        personFireAddressInfoDTO.setAge(age);
-
-        return personFireAddressInfoDTO;
+        return PersonFireAddressInfoDTO.builder()
+                .lastName(person.getLastName())
+                .phone(person.getPhone())
+                .medications(medicalRecord.getMedications())
+                .allergies(medicalRecord.getAllergies())
+                .age(age)
+                .build();
     }
 
-
     private FireAddressInfoResponseDTO createFireAddressInfoResponseDTO(int fireStationNumber, List<PersonFireAddressInfoDTO> personFireAddressInfoDTOS) {
-        FireAddressInfoResponseDTO fireAddressInfoResponseDTO = new FireAddressInfoResponseDTO();
 
-        fireAddressInfoResponseDTO.setStationNumber(fireStationNumber);
-        fireAddressInfoResponseDTO.setPersons(personFireAddressInfoDTOS);
-
-        return fireAddressInfoResponseDTO;
+        return FireAddressInfoResponseDTO.builder()
+                .stationNumber(fireStationNumber)
+                .persons(personFireAddressInfoDTOS)
+                .build();
     }
 }

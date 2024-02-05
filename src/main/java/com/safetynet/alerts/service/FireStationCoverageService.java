@@ -48,24 +48,21 @@ public class FireStationCoverageService {
 
 
     private PersonFireStationCoverageDTO createPersonFireStationCoverageDTO(Person person) {
-        PersonFireStationCoverageDTO personFireStationCoverageDTO = new PersonFireStationCoverageDTO();
 
-        personFireStationCoverageDTO.setFirstName(person.getFirstName());
-        personFireStationCoverageDTO.setLastName(person.getLastName());
-        personFireStationCoverageDTO.setAddress(person.getAddress());
-        personFireStationCoverageDTO.setPhone(person.getPhone());
-
-        return personFireStationCoverageDTO;
+        return PersonFireStationCoverageDTO.builder()
+                .firstName(person.getFirstName())
+                .lastName(person.getLastName())
+                .address(person.getAddress())
+                .phone(person.getPhone())
+                .build();
     }
 
-
     private FireStationCoverageResponseDTO createFireStationCoverageResponseDTO(List<PersonFireStationCoverageDTO> personFireStationCoverageDTOS, int adultsCount, int childrenCount) {
-        FireStationCoverageResponseDTO fireStationCoverageResponseDTO = new FireStationCoverageResponseDTO();
 
-        fireStationCoverageResponseDTO.setPersons(personFireStationCoverageDTOS);
-        fireStationCoverageResponseDTO.setAdultsCount(adultsCount);
-        fireStationCoverageResponseDTO.setChildrenCount(childrenCount);
-
-        return fireStationCoverageResponseDTO;
+        return FireStationCoverageResponseDTO.builder()
+                .persons(personFireStationCoverageDTOS)
+                .adultsCount(adultsCount)
+                .childrenCount(childrenCount)
+                .build();
     }
 }

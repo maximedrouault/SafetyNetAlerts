@@ -48,15 +48,14 @@ public class PersonInfoService {
 
 
     private PersonInfoDTO createPersonInfoDTO(Person person, int age, MedicalRecord medicalRecord) {
-        PersonInfoDTO personInfoDTO = new PersonInfoDTO();
 
-        personInfoDTO.setLastName(person.getLastName());
-        personInfoDTO.setAddress(person.getAddress());
-        personInfoDTO.setAge(age);
-        personInfoDTO.setEmail(person.getEmail());
-        personInfoDTO.setMedications(medicalRecord.getMedications());
-        personInfoDTO.setAllergies(medicalRecord.getAllergies());
-
-        return personInfoDTO;
+        return PersonInfoDTO.builder()
+                .lastName(person.getLastName())
+                .address(person.getAddress())
+                .age(age)
+                .email(person.getEmail())
+                .medications(medicalRecord.getMedications())
+                .allergies(medicalRecord.getMedications())
+                .build();
     }
 }
