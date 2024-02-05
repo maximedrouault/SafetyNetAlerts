@@ -3,6 +3,7 @@ package com.safetynet.alerts.service;
 import com.safetynet.alerts.dto.FloodStationCoverageResponseDTO;
 import com.safetynet.alerts.dto.PersonFloodStationCoverageDTO;
 import com.safetynet.alerts.model.DataContainer;
+import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.utils.FireStationUtils;
 import com.safetynet.alerts.utils.MedicalRecordUtils;
@@ -27,30 +28,33 @@ public class FloodStationCoverageService {
 
     public List<FloodStationCoverageResponseDTO> getFloodStationCoverage(List<Integer> stationNumbers) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
-        List<String> fireStationAddressForNumbers = fireStationUtils.findFireStationAddressByNumbers(dataContainer.getFirestations(), stationNumbers);
-        List<Person> personsAtAddress = personUtils.getCoveredPersonsByAddresses(dataContainer.getPersons(), fireStationAddressForNumbers);
+        List<String> coveredAddresses = fireStationUtils.getAddressesCoveredByFireStations(dataContainer.getFirestations(), stationNumbers);
+        List<Person> coveredPersons = personUtils.getCoveredPersonsByAddresses(dataContainer.getPersons(), coveredAddresses);
 
-        if (fireStationAddressForNumbers.isEmpty() || personsAtAddress.isEmpty()) {
+        if (coveredAddresses.isEmpty() || coveredPersons.isEmpty()) {
             log.error("No Fire station or person found for station numbers : '{}'.", stationNumbers);
             return List.of();
         }
 
-        Map<String, List<PersonFloodStationCoverageDTO>> addressToPersonsMap = createAddressToPersonsMap(personsAtAddress, dataContainer);
+        Map<Person, MedicalRecord> personToMedicalRecordMap = medicalRecordUtils.createPersonToMedicalRecordMap(coveredPersons, dataContainer.getMedicalrecords());
 
-        List<FloodStationCoverageResponseDTO> fireStationCoverageResponseDTOS = fireStationAddressForNumbers.stream()
-                .map(address -> createFloodStationCoverageResponseDTO(address, addressToPersonsMap.get(address)))
+        Map<String, List<PersonFloodStationCoverageDTO>> addressToPersonsDTOsMap = coveredPersons.stream()
+                .collect(Collectors.groupingBy(
+                        Person::getAddress,
+                        Collectors.mapping(person -> {
+                            String birthdate = personToMedicalRecordMap.get(person).getBirthdate();
+                            int age = medicalRecordUtils.getAge(birthdate);
+                            return createPersonFloodStationCoverageDTO(person, age, personToMedicalRecordMap.get(person));
+                        },
+                        Collectors.toList())
+                ));
+
+        List<FloodStationCoverageResponseDTO> fireStationCoverageResponseDTOS = addressToPersonsDTOsMap.entrySet().stream()
+                .map(entry -> createFloodStationCoverageResponseDTO(entry.getKey(), entry.getValue()))
                 .toList();
 
         log.info("Flood station coverage for station numbers '{}' processed.", stationNumbers);
         return fireStationCoverageResponseDTOS;
-    }
-
-
-    private Map<String, List<PersonFloodStationCoverageDTO>> createAddressToPersonsMap(List<Person> persons, DataContainer dataContainer) {
-        return persons.stream()
-                .collect(Collectors.groupingBy(Person::getAddress,
-                        Collectors.mapping(person -> createPersonFloodStationCoverageDTO(person, dataContainer),
-                        Collectors.toList())));
     }
 
 
@@ -64,13 +68,14 @@ public class FloodStationCoverageService {
     }
 
 
-    private PersonFloodStationCoverageDTO createPersonFloodStationCoverageDTO(Person person, DataContainer dataContainer) {
+    private PersonFloodStationCoverageDTO createPersonFloodStationCoverageDTO(Person person, int age, MedicalRecord medicalRecord) {
         PersonFloodStationCoverageDTO personFloodStationCoverageDTO = new PersonFloodStationCoverageDTO();
 
         personFloodStationCoverageDTO.setLastName(person.getLastName());
         personFloodStationCoverageDTO.setPhone(person.getPhone());
-
-        medicalRecordUtils.setCommonMedicalInfo(personFloodStationCoverageDTO, person, dataContainer.getMedicalrecords());
+        personFloodStationCoverageDTO.setAge(age);
+        personFloodStationCoverageDTO.setMedications(medicalRecord.getMedications());
+        personFloodStationCoverageDTO.setAllergies(medicalRecord.getAllergies());
 
         return personFloodStationCoverageDTO;
     }

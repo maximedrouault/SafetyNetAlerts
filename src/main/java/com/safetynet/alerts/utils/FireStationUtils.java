@@ -16,7 +16,7 @@ public class FireStationUtils {
                 .findFirst();
     }
 
-    public List<String> findFireStationAddressByNumbers(List<FireStation> fireStations, List<Integer> stationNumbers) {
+    public List<String> getAddressesCoveredByFireStations(List<FireStation> fireStations, List<Integer> stationNumbers) {
         return fireStations.stream()
                 .filter(fireStation -> stationNumbers.contains(fireStation.getStation()))
                 .map(FireStation::getAddress)
