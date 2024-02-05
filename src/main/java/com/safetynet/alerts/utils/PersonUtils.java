@@ -14,7 +14,7 @@ public class PersonUtils {
                 .toList();
     }
 
-    public List<Person> findPersonsByCity(List<Person> persons, String city) {
+    public List<Person> getAllPersonsInCity(List<Person> persons, String city) {
         return persons.stream()
                 .filter(person -> person.getCity().equals(city))
                 .toList();

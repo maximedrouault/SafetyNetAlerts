@@ -21,14 +21,14 @@ public class CommunityEmailService {
 
     public List<PersonCommunityEmailDTO> getCommunityEmail(String city) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
-        List<Person> personsAtCity = personUtils.findPersonsByCity(dataContainer.getPersons(), city);
+        List<Person> persons = personUtils.getAllPersonsInCity(dataContainer.getPersons(), city);
 
-        if (personsAtCity.isEmpty()) {
-            log.error("No Person found for city : '{}'.", city);
+        if (persons.isEmpty()) {
+            log.error("No Resident found for city : '{}'.", city);
             return List.of();
         }
 
-        List<PersonCommunityEmailDTO> personCommunityEmailDTOS = personsAtCity.stream()
+        List<PersonCommunityEmailDTO> personCommunityEmailDTOS = persons.stream()
                 .map(this::createPersonCommunityEmailDTO)
                 .toList();
 
