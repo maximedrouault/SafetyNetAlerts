@@ -58,24 +58,18 @@ public class MedicalRecordUtils {
         });
     }
 
-    public long countAdults(List<Person> persons, List<MedicalRecord> medicalRecords) {
-        return persons.stream()
+    public int[] countAdultsAndChildren(List<Person> persons, List<MedicalRecord> medicalRecords) {
+        int adultCount = (int) persons.stream()
                 .map(person -> getMedicalRecordForPerson(person, medicalRecords))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .map(medicalRecord -> getAge(medicalRecord.getBirthdate()))
                 .filter(age -> age > 18)
                 .count();
-    }
 
-    public long countChildren(List<Person> persons, List<MedicalRecord> medicalRecords) {
-        return persons.stream()
-                .map(person -> getMedicalRecordForPerson(person, medicalRecords))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .map(medicalRecord -> getAge(medicalRecord.getBirthdate()))
-                .filter(age -> age <= 18)
-                .count();
+        int childCount = persons.size() - adultCount;
+
+        return new int[]{adultCount, childCount};
     }
 
     public List<Person> getChildren(Map<Person, MedicalRecord> personToMedicalRecordMap) {
@@ -89,9 +83,8 @@ public class MedicalRecordUtils {
                     return age <= 18;
                 })
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .toList();
     }
-
 
     public List<Person> getFamilyMembers(List<Person> persons, Person child) {
 

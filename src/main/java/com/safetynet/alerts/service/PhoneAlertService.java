@@ -23,8 +23,8 @@ public class PhoneAlertService {
 
     public List<PersonPhoneAlertDTO> getPhoneAlert(int fireStationNumber) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
-        List<String> fireStationAddressForNumber = fireStationUtils.findFireStationAddressByNumber(dataContainer.getFirestations(), fireStationNumber);
-        List<Person> personsAtAddress = personUtils.findPersonsByAddresses(dataContainer.getPersons(), fireStationAddressForNumber);
+        List<String> fireStationAddressForNumber = fireStationUtils.getAddressesCoveredByFireStation(dataContainer.getFirestations(), fireStationNumber);
+        List<Person> personsAtAddress = personUtils.getCoveredPersonsByAddresses(dataContainer.getPersons(), fireStationAddressForNumber);
 
         if (fireStationAddressForNumber.isEmpty() || personsAtAddress.isEmpty()) {
             log.error("No address or person covered by station number {}", fireStationNumber);

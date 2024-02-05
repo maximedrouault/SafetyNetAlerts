@@ -27,7 +27,7 @@ public class FireAddressInfoService {
 
     public List<PersonFireAddressInfoDTO> getFireAddressInfo(String address) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
-        List<Person> personsAtAddress = personUtils.getCoveredPersons(dataContainer.getPersons(), address);
+        List<Person> personsAtAddress = personUtils.getCoveredPersonsByAddress(dataContainer.getPersons(), address);
         Optional<Integer> fireStationNumberForAddress = fireStationUtils.findFireStationNumberByAddress(dataContainer.getFirestations(), address);
 
         if (personsAtAddress.isEmpty() || fireStationNumberForAddress.isEmpty()) {

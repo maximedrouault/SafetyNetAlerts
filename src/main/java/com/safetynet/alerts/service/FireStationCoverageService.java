@@ -26,18 +26,19 @@ public class FireStationCoverageService {
 
     public FireStationCoverageResponseDTO getFireStationCoverage(int stationNumber) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
-        List<String> fireStationAddressForNumber = fireStationUtils.findFireStationAddressByNumber(dataContainer.getFirestations(), stationNumber);
-        List<Person> personsAtAddress = personUtils.findPersonsByAddresses(dataContainer.getPersons(), fireStationAddressForNumber);
+        List<String> coveredAddresses = fireStationUtils.getAddressesCoveredByFireStation(dataContainer.getFirestations(), stationNumber);
+        List<Person> coveredPersons = personUtils.getCoveredPersonsByAddresses(dataContainer.getPersons(), coveredAddresses);
 
-        if (fireStationAddressForNumber.isEmpty() || personsAtAddress.isEmpty()) {
+        if (coveredAddresses.isEmpty() || coveredPersons.isEmpty()) {
             log.error("No Fire station or person found for station number : '{}'.", stationNumber);
             return createFireStationCoverageResponseDTO(Collections.emptyList(), 0, 0);
         }
 
-        long adultsCount = medicalRecordUtils.countAdults(personsAtAddress, dataContainer.getMedicalrecords());
-        long childrenCount = medicalRecordUtils.countChildren(personsAtAddress, dataContainer.getMedicalrecords());
+        int[] adultsAndChildrenCounts = medicalRecordUtils.countAdultsAndChildren(coveredPersons, dataContainer.getMedicalrecords());
+        int adultsCount = adultsAndChildrenCounts[0];
+        int childrenCount = adultsAndChildrenCounts[1];
 
-        List<PersonFireStationCoverageDTO> personFireStationCoverageDTOS = personsAtAddress.stream()
+        List<PersonFireStationCoverageDTO> personFireStationCoverageDTOS = coveredPersons.stream()
                 .map(this::createPersonFireStationCoverageDTO)
                 .toList();
 
@@ -58,12 +59,12 @@ public class FireStationCoverageService {
     }
 
 
-    private FireStationCoverageResponseDTO createFireStationCoverageResponseDTO(List<PersonFireStationCoverageDTO> persons, long adultsCount, long childrenCount) {
+    private FireStationCoverageResponseDTO createFireStationCoverageResponseDTO(List<PersonFireStationCoverageDTO> personFireStationCoverageDTOS, int adultsCount, int childrenCount) {
         FireStationCoverageResponseDTO fireStationCoverageResponseDTO = new FireStationCoverageResponseDTO();
 
-        fireStationCoverageResponseDTO.setPersons(persons);
-        fireStationCoverageResponseDTO.setAdultsCount((int) adultsCount);
-        fireStationCoverageResponseDTO.setChildrenCount((int) childrenCount);
+        fireStationCoverageResponseDTO.setPersons(personFireStationCoverageDTOS);
+        fireStationCoverageResponseDTO.setAdultsCount(adultsCount);
+        fireStationCoverageResponseDTO.setChildrenCount(childrenCount);
 
         return fireStationCoverageResponseDTO;
     }

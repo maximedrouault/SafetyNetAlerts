@@ -8,7 +8,7 @@ import java.util.List;
 @Component
 public class PersonUtils {
 
-    public List<Person> getCoveredPersons(List<Person> persons, String address) {
+    public List<Person> getCoveredPersonsByAddress(List<Person> persons, String address) {
         return persons.stream()
                 .filter(person -> person.getAddress().equals(address))
                 .toList();
@@ -26,7 +26,7 @@ public class PersonUtils {
                 .toList();
     }
 
-    public List<Person> findPersonsByAddresses(List<Person> persons, List<String> addresses) {
+    public List<Person> getCoveredPersonsByAddresses(List<Person> persons, List<String> addresses) {
         return persons.stream()
                 .filter(person -> addresses.contains(person.getAddress()))
                 .toList();

@@ -25,7 +25,7 @@ public class ChildAlertService {
 
     public List<PersonChildAlertDTO> getChildAlert(String address) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
-        List<Person> coveredPersons = personUtils.getCoveredPersons(dataContainer.getPersons(), address);
+        List<Person> coveredPersons = personUtils.getCoveredPersonsByAddress(dataContainer.getPersons(), address);
 
         if (coveredPersons.isEmpty()) {
             log.error("No person found at address : {}", address);

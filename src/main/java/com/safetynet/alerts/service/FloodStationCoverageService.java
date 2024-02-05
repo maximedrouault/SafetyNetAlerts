@@ -28,7 +28,7 @@ public class FloodStationCoverageService {
     public List<FloodStationCoverageResponseDTO> getFloodStationCoverage(List<Integer> stationNumbers) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<String> fireStationAddressForNumbers = fireStationUtils.findFireStationAddressByNumbers(dataContainer.getFirestations(), stationNumbers);
-        List<Person> personsAtAddress = personUtils.findPersonsByAddresses(dataContainer.getPersons(), fireStationAddressForNumbers);
+        List<Person> personsAtAddress = personUtils.getCoveredPersonsByAddresses(dataContainer.getPersons(), fireStationAddressForNumbers);
 
         if (fireStationAddressForNumbers.isEmpty() || personsAtAddress.isEmpty()) {
             log.error("No Fire station or person found for station numbers : '{}'.", stationNumbers);

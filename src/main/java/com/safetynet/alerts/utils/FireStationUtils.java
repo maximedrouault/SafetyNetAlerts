@@ -23,7 +23,7 @@ public class FireStationUtils {
                 .toList();
     }
 
-    public List<String> findFireStationAddressByNumber(List<FireStation> fireStations, int stationNumber) {
+    public List<String> getAddressesCoveredByFireStation(List<FireStation> fireStations, int stationNumber) {
         return fireStations.stream()
                 .filter(fireStation -> stationNumber == fireStation.getStation())
                 .map(FireStation::getAddress)
