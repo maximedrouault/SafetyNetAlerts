@@ -1,5 +1,6 @@
 package com.safetynet.alerts.service;
 
+import com.safetynet.alerts.dto.FireAddressInfoResponseDTO;
 import com.safetynet.alerts.dto.PersonFireAddressInfoDTO;
 import com.safetynet.alerts.model.DataContainer;
 import com.safetynet.alerts.model.MedicalRecord;
@@ -10,7 +11,10 @@ import com.safetynet.alerts.utils.PersonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -25,34 +29,50 @@ public class FireAddressInfoService {
     private final FireStationUtils fireStationUtils;
 
 
-    public List<PersonFireAddressInfoDTO> getFireAddressInfo(String address) throws Exception {
+    public FireAddressInfoResponseDTO getFireAddressInfo(String address) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
-        List<Person> personsAtAddress = personUtils.getCoveredPersonsByAddress(dataContainer.getPersons(), address);
-        Optional<Integer> fireStationNumberForAddress = fireStationUtils.findFireStationNumberByAddress(dataContainer.getFirestations(), address);
+        List<Person> coveredPersons = personUtils.getCoveredPersonsByAddress(dataContainer.getPersons(), address);
+        Optional<Integer> fireStationNumber = fireStationUtils.getFireStationNumberByAddress(dataContainer.getFirestations(), address);
 
-        if (personsAtAddress.isEmpty() || fireStationNumberForAddress.isEmpty()) {
+        if (coveredPersons.isEmpty() || fireStationNumber.isEmpty()) {
             log.error("No Person or Fire station number found for address : '{}'.", address);
-            return List.of();
+            return createFireAddressInfoResponseDTO(0, Collections.emptyList());
         }
 
-        List<PersonFireAddressInfoDTO> personFireAddressInfoDTOS = personsAtAddress.stream()
-            .map(person -> createPersonFireAddressInfoDTO(person, fireStationNumberForAddress, dataContainer.getMedicalrecords()))
-            .toList();
+        Map<Person, MedicalRecord> personToMedicalRecordMap = medicalRecordUtils.createPersonToMedicalRecordMap(coveredPersons, dataContainer.getMedicalrecords());
+
+        List<PersonFireAddressInfoDTO> personFireAddressInfoDTOS = coveredPersons.stream()
+                .map(person -> {
+                    String birthdate = personToMedicalRecordMap.get(person).getBirthdate();
+                    int age = medicalRecordUtils.getAge(birthdate);
+                    return createPersonFireAddressInfoDTO(person, age, personToMedicalRecordMap.get(person));
+                })
+                .toList();
 
         log.info("Fire address info processed for address : '{}'.", address);
-        return personFireAddressInfoDTOS;
+        return createFireAddressInfoResponseDTO(fireStationNumber.get(), personFireAddressInfoDTOS);
     }
 
 
-    private PersonFireAddressInfoDTO createPersonFireAddressInfoDTO(Person person, Optional<Integer> fireStationNumberForAddress, List<MedicalRecord> medicalRecords) {
+    private PersonFireAddressInfoDTO createPersonFireAddressInfoDTO(Person person, int age, MedicalRecord medicalRecord) {
         PersonFireAddressInfoDTO personFireAddressInfoDTO = new  PersonFireAddressInfoDTO();
 
         personFireAddressInfoDTO.setLastName(person.getLastName());
         personFireAddressInfoDTO.setPhone(person.getPhone());
-        fireStationNumberForAddress.ifPresent(personFireAddressInfoDTO::setStationNumber);
-
-        medicalRecordUtils.setCommonMedicalInfo(personFireAddressInfoDTO, person, medicalRecords);
+        personFireAddressInfoDTO.setMedications(medicalRecord.getMedications());
+        personFireAddressInfoDTO.setAllergies(medicalRecord.getAllergies());
+        personFireAddressInfoDTO.setAge(age);
 
         return personFireAddressInfoDTO;
+    }
+
+
+    private FireAddressInfoResponseDTO createFireAddressInfoResponseDTO(int fireStationNumber, List<PersonFireAddressInfoDTO> personFireAddressInfoDTOS) {
+        FireAddressInfoResponseDTO fireAddressInfoResponseDTO = new FireAddressInfoResponseDTO();
+
+        fireAddressInfoResponseDTO.setStationNumber(fireStationNumber);
+        fireAddressInfoResponseDTO.setPersons(personFireAddressInfoDTOS);
+
+        return fireAddressInfoResponseDTO;
     }
 }

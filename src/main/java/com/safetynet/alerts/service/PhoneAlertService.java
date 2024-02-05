@@ -23,15 +23,15 @@ public class PhoneAlertService {
 
     public List<PersonPhoneAlertDTO> getPhoneAlert(int fireStationNumber) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
-        List<String> fireStationAddressForNumber = fireStationUtils.getAddressesCoveredByFireStation(dataContainer.getFirestations(), fireStationNumber);
-        List<Person> personsAtAddress = personUtils.getCoveredPersonsByAddresses(dataContainer.getPersons(), fireStationAddressForNumber);
+        List<String> coveredAddresses = fireStationUtils.getAddressesCoveredByFireStation(dataContainer.getFirestations(), fireStationNumber);
+        List<Person> coveredPersons = personUtils.getCoveredPersonsByAddresses(dataContainer.getPersons(), coveredAddresses);
 
-        if (fireStationAddressForNumber.isEmpty() || personsAtAddress.isEmpty()) {
+        if (coveredAddresses.isEmpty() || coveredPersons.isEmpty()) {
             log.error("No address or person covered by station number {}", fireStationNumber);
             return List.of();
         }
 
-        List<PersonPhoneAlertDTO> personPhoneAlertDTOS = personsAtAddress.stream()
+        List<PersonPhoneAlertDTO> personPhoneAlertDTOS = coveredPersons.stream()
                 .map(this::createPersonPhoneAlertDTO)
                 .toList();
 

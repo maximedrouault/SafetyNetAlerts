@@ -13,6 +13,5 @@ public class PersonFireAddressInfoDTO implements CommonMedicalInfo {
     private int age;
     private List<String> medications;
     private List<String> allergies;
-    private int stationNumber;
 
 }

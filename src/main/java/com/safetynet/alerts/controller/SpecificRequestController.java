@@ -32,9 +32,9 @@ public class SpecificRequestController {
 
     // FireAddressInfo
     @GetMapping("/fire")
-    public ResponseEntity<List<PersonFireAddressInfoDTO>> getFireAddressInfo(@RequestParam String address) throws Exception {
-        List<PersonFireAddressInfoDTO> personFireAddressInfoDTOS = fireAddressInfoService.getFireAddressInfo(address);
-        return (personFireAddressInfoDTOS.isEmpty()) ? ResponseEntity.notFound().build() : ResponseEntity.ok(personFireAddressInfoDTOS);
+    public ResponseEntity<FireAddressInfoResponseDTO> getFireAddressInfo(@RequestParam String address) throws Exception {
+        FireAddressInfoResponseDTO fireAddressInfoResponseDTO = fireAddressInfoService.getFireAddressInfo(address);
+        return (fireAddressInfoResponseDTO.getPersons().isEmpty()) ? ResponseEntity.notFound().build() : ResponseEntity.ok(fireAddressInfoResponseDTO);
     }
 
     // FireStationCoverage

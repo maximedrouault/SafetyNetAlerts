@@ -9,7 +9,7 @@ import java.util.Optional;
 @Component
 public class FireStationUtils {
 
-    public Optional<Integer> findFireStationNumberByAddress(List<FireStation> fireStations, String address) {
+    public Optional<Integer> getFireStationNumberByAddress(List<FireStation> fireStations, String address) {
         return fireStations.stream()
                 .filter(fireStation -> fireStation.getAddress().equals(address))
                 .map(FireStation::getStation)
