@@ -1,6 +1,5 @@
 package com.safetynet.alerts.utils;
 
-import com.safetynet.alerts.interfaces.CommonMedicalInfo;
 import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.model.Person;
 import org.springframework.stereotype.Component;
@@ -44,18 +43,6 @@ public class MedicalRecordUtils {
         Period period = Period.between(parsedBirthdate, currentDate);
 
         return period.getYears();
-    }
-
-    public void setCommonMedicalInfo(CommonMedicalInfo commonMedicalInfo, Person person, List<MedicalRecord> medicalRecords) {
-        Optional<MedicalRecord> medicalRecordForPerson = getMedicalRecordForPerson(person, medicalRecords);
-
-        medicalRecordForPerson.ifPresent(medicalRecord -> {
-            commonMedicalInfo.setMedications(medicalRecord.getMedications());
-            commonMedicalInfo.setAllergies(medicalRecord.getAllergies());
-
-            int ageOfPerson = getAge(medicalRecord.getBirthdate());
-            commonMedicalInfo.setAge(ageOfPerson);
-        });
     }
 
     public int[] countAdultsAndChildren(List<Person> persons, List<MedicalRecord> medicalRecords) {

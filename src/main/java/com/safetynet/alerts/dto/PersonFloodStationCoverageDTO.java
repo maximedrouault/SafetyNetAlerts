@@ -1,12 +1,11 @@
 package com.safetynet.alerts.dto;
 
-import com.safetynet.alerts.interfaces.CommonMedicalInfo;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class PersonFloodStationCoverageDTO implements CommonMedicalInfo {
+public class PersonFloodStationCoverageDTO {
 
     private String lastName;
     private String phone;

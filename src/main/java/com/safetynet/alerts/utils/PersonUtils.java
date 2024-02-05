@@ -20,7 +20,7 @@ public class PersonUtils {
                 .toList();
     }
 
-    public List<Person> findPersonsByFirstNameAndLastName(List<Person> persons, String firstName, String lastName) {
+    public List<Person> getPersonsByFirstNameAndLastName(List<Person> persons, String firstName, String lastName) {
         return persons.stream()
                 .filter(person -> person.getFirstName().equals(firstName) && person.getLastName().equals(lastName))
                 .toList();
