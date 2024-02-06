@@ -17,7 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-
+/**
+ * Service for managing information related to an address in case of fire.
+ * This class provides methods to retrieve information about people
+ * covered by an address in case of fire.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -28,7 +32,13 @@ public class FireAddressInfoService {
     private final MedicalRecordUtils medicalRecordUtils;
     private final FireStationUtils fireStationUtils;
 
-
+    /**
+     * Retrieves information related to an address in case of fire.
+     *
+     * @param address The address for which we want to retrieve information.
+     * @return A {@link FireAddressInfoResponseDTO} object containing information about the address in case of fire.
+     * @throws Exception If an error occurs while fetching the data.
+     */
     public FireAddressInfoResponseDTO getFireAddressInfo(String address) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<Person> coveredPersons = personUtils.getCoveredPersonsByAddress(dataContainer.getPersons(), address);

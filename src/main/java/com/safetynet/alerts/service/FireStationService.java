@@ -8,6 +8,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service for managing fire station data.
+ * This class provides methods to perform CRUD (Create, Read, Update, Delete) operations on fire station mappings.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -18,6 +22,13 @@ public class FireStationService {
 
     // CRUD
 
+    /**
+     * Deletes a fire station mapping.
+     *
+     * @param fireStationToDelete The FireStation object to be deleted.
+     * @return True if the mapping is successfully deleted, false otherwise.
+     * @throws Exception If an error occurs while performing the delete operation.
+     */
     public boolean deleteFireStationMapping(FireStation fireStationToDelete) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<FireStation> fireStations = dataContainer.getFirestations();
@@ -29,19 +40,27 @@ public class FireStationService {
                 .findFirst();
 
         if (foundFirestation.isPresent()) {
-            fireStations.remove(foundFirestation.get());
+            FireStation deletedFireStation = foundFirestation.get();
+            fireStations.remove(deletedFireStation);
 
             dataWriter.dataWrite(dataContainer);
-            log.info("Fire Station mapping successfully deleted");
+            log.info("Fire Station mapping successfully deleted for fire station number: '{}' and address: '{}'.", deletedFireStation.getStation(), deletedFireStation.getAddress());
 
             return true;
 
         } else {
-            log.error("Fire Station mapping not found");
+            log.error("Fire Station mapping not found for fire station number: '{}' and address: '{}'.", fireStationToDelete.getStation(), fireStationToDelete.getAddress());
             return false;
         }
     }
 
+    /**
+     * Updates a fire station mapping.
+     *
+     * @param fireStationToUpdate The FireStation object with updated information.
+     * @return An Optional containing the updated FireStation if successful, or empty if not found.
+     * @throws Exception If an error occurs while performing the update operation.
+     */
     public Optional<FireStation> updateFireStationMapping(FireStation fireStationToUpdate) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<FireStation> fireStations = dataContainer.getFirestations();
@@ -57,16 +76,23 @@ public class FireStationService {
             updatedFireStation.setStation(fireStationToUpdate.getStation());
 
             dataWriter.dataWrite(dataContainer);
-            log.info("Fire Station mapping successfully updated");
+            log.info("Fire Station mapping successfully updated for fire station: '{}' and address: '{}'.", updatedFireStation.getStation(), updatedFireStation.getAddress());
 
             return Optional.of(updatedFireStation);
 
         } else {
-            log.error("Not updated, Fire station not found");
+            log.error("Not updated, Fire station not found for fire station number: '{}' and address: '{}'.", fireStationToUpdate.getStation(), fireStationToUpdate.getAddress());
             return Optional.empty();
         }
     }
 
+    /**
+     * Adds a new fire station mapping.
+     *
+     * @param fireStationToAdd The FireStation object to be added.
+     * @return An Optional containing the added FireStation if successful, or empty if it already exists.
+     * @throws Exception If an error occurs while performing the add operation.
+     */
     public Optional<FireStation> addFireStationMapping(FireStation fireStationToAdd) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<FireStation> fireStations = dataContainer.getFirestations();
@@ -78,14 +104,14 @@ public class FireStationService {
                 .findFirst();
 
         if (foundFireStation.isPresent()) {
-            log.error("Not added, Fire station mapping already exist");
+            log.error("Not added, Fire station mapping already exist for fire station number: '{}' and address: '{}'.", fireStationToAdd.getStation(), fireStationToAdd.getAddress());
             return Optional.empty();
 
         } else {
             fireStations.add(fireStationToAdd);
 
             dataWriter.dataWrite(dataContainer);
-            log.info("Fire station mapping successfully added");
+            log.info("Fire station mapping successfully added for fire station number: '{}' and address: '{}'.", fireStationToAdd.getStation(), fireStationToAdd.getAddress());
 
             return Optional.of(fireStationToAdd);
         }

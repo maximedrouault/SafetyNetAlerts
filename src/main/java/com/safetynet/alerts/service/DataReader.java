@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * This class provides services for reading data from a JSON data source file and mapping it to a POJO.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -17,7 +20,12 @@ public class DataReader {
     private final ObjectMapper objectMapper;
     private final CustomProperties customProperties;
 
-
+    /**
+     * Reads data from a JSON data source file and maps it to a {@link DataContainer} POJO.
+     *
+     * @return The {@link DataContainer} containing the imported data.
+     * @throws IOException If an error occurs while reading the data source file.
+     */
     public DataContainer dataRead() throws Exception {
         DataContainer dataContainer;
 
@@ -28,7 +36,7 @@ public class DataReader {
             log.debug("Data file read and imported successfully");
 
         } catch (IOException e) {
-            log.error("Error reading and importing data source file: " + e.getMessage());
+            log.error("Error reading and importing data source file : " + e.getMessage());
             throw e;
         }
 

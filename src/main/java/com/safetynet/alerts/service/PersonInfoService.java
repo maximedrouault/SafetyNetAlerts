@@ -13,7 +13,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * Service for retrieving person information based on first name and last name.
+ * This class provides methods to search for persons by their first name and last name and retrieve their information.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -23,12 +26,20 @@ public class PersonInfoService {
     private final MedicalRecordUtils medicalRecordUtils;
     private final PersonUtils personUtils;
 
+    /**
+     * Retrieves person information based on first name and last name.
+     *
+     * @param firstName The first name of the person to search for.
+     * @param lastName  The last name of the person to search for.
+     * @return A list of {@link PersonInfoDTO} representing the information of persons with the specified first name and last name.
+     * @throws Exception If an error occurs while fetching the data.
+     */
     public List<PersonInfoDTO> getPersonInfo(String firstName, String lastName) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<Person> filteredPersons = personUtils.getPersonsByFirstNameAndLastName(dataContainer.getPersons(), firstName, lastName);
 
         if (filteredPersons.isEmpty()) {
-            log.error("No Person found for First name : '{}' and Last name : '{}'.", firstName, lastName);
+            log.error("No Person found for Firstname : '{}' and Lastname : '{}'.", firstName, lastName);
             return List.of();
         }
 
@@ -42,7 +53,7 @@ public class PersonInfoService {
             })
             .toList();
 
-        log.info("Person info processed for First name : '{}' and Last name : '{}'.", firstName, lastName);
+        log.info("Person info processed for Firstname : '{}' and Lastname : '{}'.", firstName, lastName);
         return personInfoDTOS;
     }
 

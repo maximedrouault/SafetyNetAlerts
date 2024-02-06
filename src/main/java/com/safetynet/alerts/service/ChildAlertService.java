@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-
+/**
+ * This class handles child alerts based on address.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -22,13 +24,19 @@ public class ChildAlertService {
     private final PersonUtils personUtils;
     private final MedicalRecordUtils medicalRecordUtils;
 
-
+    /**
+     * Retrieves a list of children residing at a given address.
+     *
+     * @param address The address for which to retrieve children.
+     * @return A list of {@link PersonChildAlertDTO} representing children residing at the specified address.
+     * @throws Exception If an error occurs while retrieving data.
+     */
     public List<PersonChildAlertDTO> getChildAlert(String address) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<Person> coveredPersons = personUtils.getCoveredPersonsByAddress(dataContainer.getPersons(), address);
 
         if (coveredPersons.isEmpty()) {
-            log.error("No person found at address : {}", address);
+            log.error("No person found at address : '{}'.", address);
             return List.of();
         }
 
@@ -45,7 +53,7 @@ public class ChildAlertService {
                 })
                 .toList();
 
-        log.info("Child alert processed for address '{}'.", address);
+        log.info("Child alert processed for address : '{}'.", address);
         return personChildAlertDTOS;
     }
 

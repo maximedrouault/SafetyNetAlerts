@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * This class provides services for retrieving community email information based on a city.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -19,6 +22,13 @@ public class CommunityEmailService {
     private final DataReader dataReader;
     private final PersonUtils personUtils;
 
+    /**
+     * Retrieves a list of email addresses for residents of a given city.
+     *
+     * @param city The city for which to retrieve community email addresses.
+     * @return A list of {@link PersonCommunityEmailDTO} representing email addresses of residents in the specified city.
+     * @throws Exception If an error occurs while retrieving data.
+     */
     public List<PersonCommunityEmailDTO> getCommunityEmail(String city) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<Person> persons = personUtils.getAllPersonsInCity(dataContainer.getPersons(), city);

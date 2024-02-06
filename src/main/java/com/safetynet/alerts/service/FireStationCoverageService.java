@@ -12,7 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.util.*;
 
-
+/**
+ * Service for managing fire station coverage information.
+ * This class provides methods to retrieve information about persons and coverage
+ * of a specific fire station.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -23,7 +27,13 @@ public class FireStationCoverageService {
     private final PersonUtils personUtils;
     private final FireStationUtils fireStationUtils;
 
-
+    /**
+     * Retrieves fire station coverage information for a given station number.
+     *
+     * @param stationNumber The number of the fire station for which to retrieve coverage information.
+     * @return A {@link FireStationCoverageResponseDTO} object containing information about the coverage of the fire station.
+     * @throws Exception If an error occurs while fetching the data.
+     */
     public FireStationCoverageResponseDTO getFireStationCoverage(int stationNumber) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<String> coveredAddresses = fireStationUtils.getAddressesCoveredByFireStation(dataContainer.getFirestations(), stationNumber);
@@ -42,7 +52,7 @@ public class FireStationCoverageService {
                 .map(this::createPersonFireStationCoverageDTO)
                 .toList();
 
-        log.info("Fire station coverage for station number '{}' processed. Adults count: {}, Children count: {}", stationNumber, adultsCount, childrenCount);
+        log.info("Fire station coverage for station number '{}' processed. Adults count: '{}', Children count: '{}'.", stationNumber, adultsCount, childrenCount);
         return createFireStationCoverageResponseDTO(personFireStationCoverageDTOS, adultsCount, childrenCount);
     }
 

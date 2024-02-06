@@ -15,6 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Service for managing flood station coverage information.
+ * This class provides methods to retrieve information about persons affected by floods
+ * in specified fire stations.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -25,7 +30,13 @@ public class FloodStationCoverageService {
     private final PersonUtils personUtils;
     private final FireStationUtils fireStationUtils;
 
-
+    /**
+     * Retrieves flood station coverage information for specified station numbers.
+     *
+     * @param stationNumbers The list of fire station numbers for which to retrieve flood coverage information.
+     * @return A list of {@link FloodStationCoverageResponseDTO} objects containing information about the flood coverage for each station.
+     * @throws Exception If an error occurs while fetching the data.
+     */
     public List<FloodStationCoverageResponseDTO> getFloodStationCoverage(List<Integer> stationNumbers) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<String> coveredAddresses = fireStationUtils.getAddressesCoveredByFireStations(dataContainer.getFirestations(), stationNumbers);
