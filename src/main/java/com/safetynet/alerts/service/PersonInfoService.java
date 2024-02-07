@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +41,7 @@ public class PersonInfoService {
 
         if (filteredPersons.isEmpty()) {
             log.error("No Person found for Firstname : '{}' and Lastname : '{}'.", firstName, lastName);
-            return List.of();
+            return Collections.emptyList();
         }
 
         Map<Person, MedicalRecord> personToMedicalRecordMap = medicalRecordUtils.createPersonToMedicalRecordMap(filteredPersons, dataContainer.getMedicalrecords());

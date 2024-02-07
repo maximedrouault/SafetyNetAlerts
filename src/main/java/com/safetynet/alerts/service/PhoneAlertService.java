@@ -8,6 +8,8 @@ import com.safetynet.alerts.utils.PersonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -37,7 +39,7 @@ public class PhoneAlertService {
 
         if (coveredAddresses.isEmpty() || coveredPersons.isEmpty()) {
             log.error("No address or person covered by station number '{}'.", fireStationNumber);
-            return List.of();
+            return Collections.emptyList();
         }
 
         List<PersonPhoneAlertDTO> personPhoneAlertDTOS = coveredPersons.stream()

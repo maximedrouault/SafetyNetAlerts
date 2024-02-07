@@ -37,7 +37,7 @@ public class ChildAlertService {
 
         if (coveredPersons.isEmpty()) {
             log.error("No person found at address : '{}'.", address);
-            return List.of();
+            return Collections.emptyList();
         }
 
         Map<Person, MedicalRecord> personToMedicalRecordMap = medicalRecordUtils.createPersonToMedicalRecordMap(coveredPersons, dataContainer.getMedicalrecords());

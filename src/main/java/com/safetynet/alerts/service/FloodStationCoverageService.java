@@ -11,6 +11,8 @@ import com.safetynet.alerts.utils.PersonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,7 +46,7 @@ public class FloodStationCoverageService {
 
         if (coveredAddresses.isEmpty() || coveredPersons.isEmpty()) {
             log.error("No Fire station or person found for station numbers : '{}'.", stationNumbers);
-            return List.of();
+            return Collections.emptyList();
         }
 
         Map<Person, MedicalRecord> personToMedicalRecordMap = medicalRecordUtils.createPersonToMedicalRecordMap(coveredPersons, dataContainer.getMedicalrecords());
