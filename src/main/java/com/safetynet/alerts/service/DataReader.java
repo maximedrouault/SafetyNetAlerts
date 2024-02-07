@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safetynet.alerts.CustomProperties;
 import com.safetynet.alerts.model.DataContainer;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.io.IOException;
  */
 @Service
 @RequiredArgsConstructor
-@Slf4j
+@Log4j2
 public class DataReader {
 
     private final ObjectMapper objectMapper;

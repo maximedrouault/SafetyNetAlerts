@@ -25,22 +25,16 @@ public class SpecificRequestControllerTest {
 
     @MockBean
     private ChildAlertService childAlertService;
-
     @MockBean
     private FireAddressInfoService fireAddressInfoService;
-
     @MockBean
     private FireStationCoverageService fireStationCoverageService;
-
     @MockBean
     private PhoneAlertService phoneAlertService;
-
     @MockBean
     private CommunityEmailService communityEmailService;
-
     @MockBean
     private PersonInfoService personInfoService;
-
     @MockBean
     private FloodStationCoverageService floodStationCoverageService;
 

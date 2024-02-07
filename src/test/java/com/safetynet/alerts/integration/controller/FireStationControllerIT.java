@@ -1,6 +1,6 @@
 package com.safetynet.alerts.integration.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import java.nio.file.StandardCopyOption;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Slf4j
+@Log4j2
 public class FireStationControllerIT {
 
     @Autowired
