@@ -3,60 +3,35 @@ package com.safetynet.alerts.unitaire.utils;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.utils.PersonUtils;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PersonUtilsTest {
 
     private static PersonUtils personUtils;
-    private List<Person> persons;
 
     @BeforeAll
     public static void setUp() {
         personUtils = new PersonUtils();
     }
 
-    @BeforeEach
-    public void setUpPerTest() {
-        persons = new ArrayList<>();
 
-        Person person1 = new Person();
-        person1.setFirstName("John");
-        person1.setLastName("Boyd");
-        person1.setAddress("1509 Culver St");
-        person1.setCity("Culver");
-
-        Person person2 = new Person();
-        person2.setFirstName("Jacob");
-        person2.setLastName("Boyd");
-        person2.setAddress("1509 Culver St");
-        person2.setCity("Culver");
-
-        Person person3 = new Person();
-        person3.setFirstName("Foster");
-        person3.setLastName("Shepard");
-        person3.setAddress("748 Townings Dr");
-        person3.setCity("Culver");
-
-        Person person4 = new Person();
-        person4.setFirstName("John");
-        person4.setLastName("Boyd");
-        person4.setAddress("951 LoneTree Rd");
-        person4.setCity("Culver");
-
-        persons.add(person1);
-        persons.add(person2);
-        persons.add(person3);
-        persons.add(person4);
+    private List<Person> getPersonsForTest() {
+        return List.of(
+                Person.builder().firstName("John").lastName("Boyd").address("1509 Culver St").city("Culver").build(),
+                Person.builder().firstName("Jacob").lastName("Boyd").address("1509 Culver St").city("Culver").build(),
+                Person.builder().firstName("Foster").lastName("Shepard").address("748 Townings Dr").city("Culver").build(),
+                Person.builder().firstName("John").lastName("Boyd").address("951 LoneTree Rd").city("Culver").build()
+        );
     }
 
     // getCoveredPersonsByAddress
     @Test
     public void getCoveredPersonsWithMatchingAddress() {
+        List<Person> persons = getPersonsForTest();
+
         List<Person> coveredPersons = personUtils.getCoveredPersonsByAddress(persons, "1509 Culver St");
 
         assertEquals(2, coveredPersons.size());
@@ -66,6 +41,8 @@ public class PersonUtilsTest {
 
     @Test
     public void getCoveredPersonsWhenAddressNotFound() {
+        List<Person> persons = getPersonsForTest();
+
         List<Person> coveredPersons = personUtils.getCoveredPersonsByAddress(persons, "unknown address");
 
         assertTrue(coveredPersons.isEmpty()); // We expect to have an empty List;
@@ -73,7 +50,7 @@ public class PersonUtilsTest {
 
     @Test
     public void getCoveredPersonsWhenPersonsListIsEmpty() {
-        List<Person> emptyListOfPersons = new ArrayList<>();
+        List<Person> emptyListOfPersons = List.of();
 
         List<Person> coveredPersons = personUtils.getCoveredPersonsByAddress(emptyListOfPersons, "1509 Culver St");
 
@@ -82,6 +59,8 @@ public class PersonUtilsTest {
 
     @Test
     public void getCoveredPersonsWhenAddressIsEmpty() {
+        List<Person> persons = getPersonsForTest();
+
         List<Person> coveredPersons = personUtils.getCoveredPersonsByAddress(persons, "");
 
         assertTrue(coveredPersons.isEmpty());
@@ -91,6 +70,8 @@ public class PersonUtilsTest {
     // getPersonsInCity
     @Test
     public void getPersonsInCityWithMatchingCity() {
+        List<Person> persons = getPersonsForTest();
+
         List<Person> personsInCity = personUtils.getPersonsInCity(persons, "Culver");
 
         assertEquals(4, personsInCity.size());
@@ -99,6 +80,8 @@ public class PersonUtilsTest {
 
     @Test
     public void getPersonsInCityWhenCityNotFound() {
+        List<Person> persons = getPersonsForTest();
+
         List<Person> personsInCity = personUtils.getPersonsInCity(persons, "unknown city");
 
         assertTrue(personsInCity.isEmpty()); // We expect to have an empty List;
@@ -106,7 +89,7 @@ public class PersonUtilsTest {
 
     @Test
     public void getPersonsInCityWhenPersonsListIsEmpty() {
-        List<Person> emptyListOfPersons = new ArrayList<>();
+        List<Person> emptyListOfPersons = List.of();
 
         List<Person> personsInCity = personUtils.getPersonsInCity(emptyListOfPersons, "Culver");
 
@@ -115,6 +98,8 @@ public class PersonUtilsTest {
 
     @Test
     public void getPersonsInCityWhenCityIsEmpty() {
+        List<Person> persons = getPersonsForTest();
+
         List<Person> personsInCity = personUtils.getPersonsInCity(persons, "");
 
         assertTrue(personsInCity.isEmpty());
@@ -124,6 +109,8 @@ public class PersonUtilsTest {
     // getPersonsByFirstNameAndLastName
     @Test
     public void getPersonsByFirstNameAndLastNameWithMatchingFirstNameAndLastName() {
+        List<Person> persons = getPersonsForTest();
+
         List<Person> personList = personUtils.getPersonsByFirstNameAndLastName(persons, "John", "Boyd");
 
         assertEquals(2, personList.size());
@@ -135,6 +122,8 @@ public class PersonUtilsTest {
 
     @Test
     public void getPersonsByFirstNameAndLastNameWhenFirstNameNotFound() {
+        List<Person> persons = getPersonsForTest();
+
         List<Person> personList = personUtils.getPersonsByFirstNameAndLastName(persons, "unknown firstName", "Boyd");
 
         assertTrue(personList.isEmpty()); // We expect to have an empty List;
@@ -142,6 +131,8 @@ public class PersonUtilsTest {
 
     @Test
     public void getPersonsByFirstNameAndLastNameWhenLastNameNotFound() {
+        List<Person> persons = getPersonsForTest();
+
         List<Person> personList = personUtils.getPersonsByFirstNameAndLastName(persons, "John", "unknown lastName");
 
         assertTrue(personList.isEmpty());
@@ -149,7 +140,7 @@ public class PersonUtilsTest {
 
     @Test
     public void getPersonsByFirstNameAndLastNameWhenPersonsListIsEmpty() {
-        List<Person> emptyListOfPersons = new ArrayList<>();
+        List<Person> emptyListOfPersons = List.of();
 
         List<Person> personList = personUtils.getPersonsByFirstNameAndLastName(emptyListOfPersons, "John", "Boyd");
 
@@ -158,6 +149,8 @@ public class PersonUtilsTest {
 
     @Test
     public void getPersonsByFirstNameAndLastNameWhenFirstNameIsEmpty() {
+        List<Person> persons = getPersonsForTest();
+
         List<Person> personList = personUtils.getPersonsByFirstNameAndLastName(persons, "", "Boyd");
 
         assertTrue(personList.isEmpty());
@@ -165,6 +158,8 @@ public class PersonUtilsTest {
 
     @Test
     public void getPersonsByFirstNameAndLastNameWhenLastNameIsEmpty() {
+        List<Person> persons = getPersonsForTest();
+
         List<Person> personList = personUtils.getPersonsByFirstNameAndLastName(persons, "John", "");
 
         assertTrue(personList.isEmpty());    }
@@ -173,9 +168,8 @@ public class PersonUtilsTest {
     // getCoveredPersonsByAddresses
     @Test
     public void getCoveredPersonsByAddressesWithMatchingAddresses() {
-        List<String> addresses = new ArrayList<>();
-        addresses.add("748 Townings Dr");
-        addresses.add("951 LoneTree Rd");
+        List<Person> persons = getPersonsForTest();
+        List<String> addresses = List.of("748 Townings Dr", "951 LoneTree Rd");
 
         List<Person> coveredPersons = personUtils.getCoveredPersonsByAddresses(persons, addresses);
 
@@ -188,8 +182,8 @@ public class PersonUtilsTest {
 
     @Test
     public void getCoveredPersonsByAddressesWhenAddressesNotFound() {
-        List<String> unknownAddresses = new ArrayList<>();
-        unknownAddresses.add("unknown address");
+        List<Person> persons = getPersonsForTest();
+        List<String> unknownAddresses = List.of("unknown address");
 
         List<Person> coveredPersons = personUtils.getCoveredPersonsByAddresses(persons, unknownAddresses);
 
@@ -198,10 +192,8 @@ public class PersonUtilsTest {
 
     @Test
     public void getCoveredPersonsByAddressesWhenPersonsListIsEmpty() {
-        List<Person> emptyListOfPersons = new ArrayList<>();
-        List<String> addresses = new ArrayList<>();
-        addresses.add("748 Townings Dr");
-        addresses.add("951 LoneTree Rd");
+        List<Person> emptyListOfPersons = List.of();
+        List<String> addresses = List.of("748 Townings Dr", "951 LoneTree Rd");
 
         List<Person> coveredPersons = personUtils.getCoveredPersonsByAddresses(emptyListOfPersons, addresses);
 
@@ -210,7 +202,8 @@ public class PersonUtilsTest {
 
     @Test
     public void getCoveredPersonsByAddressesWhenAddressesIsEmpty() {
-        List<String> addresses = new ArrayList<>();
+        List<Person> persons = getPersonsForTest();
+        List<String> addresses = List.of();
 
         List<Person> coveredPersons = personUtils.getCoveredPersonsByAddresses(persons, addresses);
 

@@ -34,7 +34,7 @@ public class MedicalRecordUtils {
                                         person.getFirstName().equals(medicalRecord.getFirstName()) &&
                                         person.getLastName().equals(medicalRecord.getLastName()))
                                 .findFirst()
-                                .orElse(new MedicalRecord())));
+                                .orElse(MedicalRecord.builder().build())));
     }
 
     public int getAge(String birthdate) {
@@ -46,17 +46,21 @@ public class MedicalRecordUtils {
     }
 
     public int[] countAdultsAndChildren(List<Person> persons, List<MedicalRecord> medicalRecords) {
-        int adultCount = (int) persons.stream()
-                .map(person -> getMedicalRecordForPerson(person, medicalRecords))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .map(medicalRecord -> getAge(medicalRecord.getBirthdate()))
-                .filter(age -> age > 18)
-                .count();
+        int[] counts = new int[2]; // [adultCount, childCount]
 
-        int childCount = persons.size() - adultCount;
+        persons.forEach(person -> {
+            Optional<MedicalRecord> medicalRecordOpt = getMedicalRecordForPerson(person, medicalRecords);
+            medicalRecordOpt.ifPresent(medicalRecord -> {
+                int age = getAge(medicalRecord.getBirthdate());
+                if (age > 18) {
+                    counts[0]++; // Increase adultCount
+                } else {
+                    counts[1]++; // Increase childCount
+                }
+            });
+        });
 
-        return new int[]{adultCount, childCount};
+        return counts;
     }
 
     public List<Person> getChildren(Map<Person, MedicalRecord> personToMedicalRecordMap) {

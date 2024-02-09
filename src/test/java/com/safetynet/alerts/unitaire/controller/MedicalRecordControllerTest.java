@@ -4,15 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safetynet.alerts.controller.MedicalRecordController;
 import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.service.MedicalRecordService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.util.Optional;
-
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,80 +29,77 @@ public class MedicalRecordControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private MedicalRecord medicalRecord;
+    private String jsonBody;
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        medicalRecord = MedicalRecord.builder().build();
+        jsonBody = objectMapper.writeValueAsString(medicalRecord); // Convert object to JSON
+    }
+
 
     @Test
     public void deleteMedicalRecord_whenMedicalRecordExists_shouldReturnOk() throws Exception {
-        MedicalRecord medicalRecordToDelete = new MedicalRecord();
-        String jsonRequest = objectMapper.writeValueAsString(medicalRecordToDelete); // Convert object to JSON
-        when(medicalRecordService.deleteMedicalRecord(medicalRecordToDelete)).thenReturn(true);
+        when(medicalRecordService.deleteMedicalRecord(medicalRecord)).thenReturn(true);
 
         mockMvc.perform(delete("/medicalRecord")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+                        .content(jsonBody))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void deleteMedicalRecord_whenMedicalRecordDoesNotExist_shouldReturnNotFound() throws Exception {
-        MedicalRecord medicalRecordToDelete = new MedicalRecord();
-        String jsonRequest = objectMapper.writeValueAsString(medicalRecordToDelete);
-        when(medicalRecordService.deleteMedicalRecord(medicalRecordToDelete)).thenReturn(false);
+        when(medicalRecordService.deleteMedicalRecord(medicalRecord)).thenReturn(false);
 
         mockMvc.perform(delete("/medicalRecord")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+                        .content(jsonBody))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void updateMedicalRecord_whenMedicalRecordExists_shouldReturnOk() throws Exception {
-        MedicalRecord medicalRecordToUpdate = new MedicalRecord();
-        String jsonRequest = objectMapper.writeValueAsString(medicalRecordToUpdate);
-        Optional<MedicalRecord> updatedMedicalRecord = Optional.of(medicalRecordToUpdate);
-        when(medicalRecordService.updateMedicalRecord(medicalRecordToUpdate)).thenReturn(updatedMedicalRecord);
+                Optional<MedicalRecord> updatedMedicalRecord = Optional.of(medicalRecord);
+        when(medicalRecordService.updateMedicalRecord(medicalRecord)).thenReturn(updatedMedicalRecord);
 
         mockMvc.perform(put("/medicalRecord")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+                        .content(jsonBody))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void updateMedicalRecord_whenMedicalRecordDoesNotExist_shouldReturnNotFound() throws Exception {
-        MedicalRecord medicalRecordToUpdate = new MedicalRecord();
-        String jsonRequest = objectMapper.writeValueAsString(medicalRecordToUpdate);
         Optional<MedicalRecord> updatedMedicalRecord = Optional.empty();
-        when(medicalRecordService.updateMedicalRecord(medicalRecordToUpdate)).thenReturn(updatedMedicalRecord);
+        when(medicalRecordService.updateMedicalRecord(medicalRecord)).thenReturn(updatedMedicalRecord);
 
         mockMvc.perform(put("/medicalRecord")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+                        .content(jsonBody))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void addMedicalRecord_whenMedicalRecordExists_shouldReturnConflict() throws Exception {
-        MedicalRecord medicalRecordToAdd = new MedicalRecord();
-        String jsonRequest = objectMapper.writeValueAsString(medicalRecordToAdd);
         Optional<MedicalRecord> addedMedicalRecord = Optional.empty();
-        when(medicalRecordService.addMedicalRecord(medicalRecordToAdd)).thenReturn(addedMedicalRecord);
+        when(medicalRecordService.addMedicalRecord(medicalRecord)).thenReturn(addedMedicalRecord);
 
         mockMvc.perform(post("/medicalRecord")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+                        .content(jsonBody))
                 .andExpect(status().isConflict());
     }
 
     @Test
     public void addMedicalRecord_whenMedicalRecordDoesNotExist_shouldReturnOK() throws Exception {
-        MedicalRecord medicalRecordToAdd = new MedicalRecord();
-        String jsonRequest = objectMapper.writeValueAsString(medicalRecordToAdd);
-        Optional<MedicalRecord> addedMedicalRecord = Optional.of(medicalRecordToAdd);
-        when(medicalRecordService.addMedicalRecord(medicalRecordToAdd)).thenReturn(addedMedicalRecord);
+        Optional<MedicalRecord> addedMedicalRecord = Optional.of(medicalRecord);
+        when(medicalRecordService.addMedicalRecord(medicalRecord)).thenReturn(addedMedicalRecord);
 
         mockMvc.perform(post("/medicalRecord")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+                        .content(jsonBody))
                 .andExpect(status().isOk());
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safetynet.alerts.controller.PersonController;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.service.PersonService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,80 +31,77 @@ public class PersonControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private Person person;
+    private String jsonBody;
+
+    @BeforeEach
+    public void setUp() throws Exception{
+        person = Person.builder().build();
+        jsonBody = objectMapper.writeValueAsString(person); // Convert object to JSON
+    }
+
 
     @Test
     public void deletePerson_whenPersonExists_shouldReturnOk() throws Exception {
-        Person personToDelete = new Person();
-        String jsonRequest = objectMapper.writeValueAsString(personToDelete); // Convert object to JSON
-        when(personService.deletePerson(personToDelete)).thenReturn(true);
+        when(personService.deletePerson(person)).thenReturn(true);
 
         mockMvc.perform(delete("/person")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+                        .content(jsonBody))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void deletePerson_whenPersonDoesNotExist_shouldReturnNotFound() throws Exception {
-        Person personToDelete = new Person();
-        String jsonRequest = objectMapper.writeValueAsString(personToDelete);
-        when(personService.deletePerson(personToDelete)).thenReturn(false);
+        when(personService.deletePerson(person)).thenReturn(false);
 
         mockMvc.perform(delete("/person")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+                        .content(jsonBody))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void updatePerson_whenPersonExists_shouldReturnOk() throws Exception {
-        Person personToUpdate = new Person();
-        String jsonRequest = objectMapper.writeValueAsString(personToUpdate);
-        Optional<Person> updatedPerson = Optional.of(personToUpdate);
-        when(personService.updatePerson(personToUpdate)).thenReturn(updatedPerson);
+        Optional<Person> updatedPerson = Optional.of(person);
+        when(personService.updatePerson(person)).thenReturn(updatedPerson);
 
         mockMvc.perform(put("/person")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+                        .content(jsonBody))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void updatePerson_whenPersonDoesNotExist_shouldReturnNotFound() throws Exception {
-        Person personToUpdate = new Person();
-        String jsonRequest = objectMapper.writeValueAsString(personToUpdate);
         Optional<Person> updatedPerson = Optional.empty();
-        when(personService.updatePerson(personToUpdate)).thenReturn(updatedPerson);
+        when(personService.updatePerson(person)).thenReturn(updatedPerson);
 
         mockMvc.perform(put("/person")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+                        .content(jsonBody))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void addPerson_whenPersonExists_shouldReturnConflict() throws Exception {
-        Person personToAdd = new Person();
-        String jsonRequest = objectMapper.writeValueAsString(personToAdd);
         Optional<Person> addedPerson = Optional.empty();
-        when(personService.addPerson(personToAdd)).thenReturn(addedPerson);
+        when(personService.addPerson(person)).thenReturn(addedPerson);
 
         mockMvc.perform(post("/person")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+                        .content(jsonBody))
                 .andExpect(status().isConflict());
     }
 
     @Test
     public void addPerson_whenPersonDoesNotExist_shouldReturnOK() throws Exception {
-        Person personToAdd = new Person();
-        String jsonRequest = objectMapper.writeValueAsString(personToAdd);
-        Optional<Person> addedPerson = Optional.of(personToAdd);
-        when(personService.addPerson(personToAdd)).thenReturn(addedPerson);
+        Optional<Person> addedPerson = Optional.of(person);
+        when(personService.addPerson(person)).thenReturn(addedPerson);
 
         mockMvc.perform(post("/person")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+                        .content(jsonBody))
                 .andExpect(status().isOk());
     }
 }
