@@ -29,7 +29,7 @@ public class DataReaderTest {
 
     @Test
     public void dataRead_shouldImportDataSuccessfully_whenJsonDataFileIsProvided() throws Exception {
-        DataContainer dataContainer = new DataContainer();
+        DataContainer dataContainer = DataContainer.builder().build();
         when(customProperties.getDataSourceFile()).thenReturn("path/to/fictive/testData.json");
         when(objectMapper.readValue(any(File.class), eq(DataContainer.class))).thenReturn(dataContainer);
 

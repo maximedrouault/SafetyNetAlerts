@@ -29,7 +29,7 @@ public class DataWriterTest {
 
     @Test
     public void dataWrite_shouldWriteDataSuccessfully_whenValidDataContainerProvided() throws Exception {
-        DataContainer mockDataContainer = new DataContainer();
+        DataContainer mockDataContainer = DataContainer.builder().build();
         when(customProperties.getDataSourceFile()).thenReturn("path/to/fictive/testData.json");
 
         dataWriter.dataWrite(mockDataContainer);
@@ -39,7 +39,7 @@ public class DataWriterTest {
 
     @Test
     public void dataWrite_shouldThrowIOException_whenWriteFails() throws Exception {
-        DataContainer mockDataContainer = new DataContainer();
+        DataContainer mockDataContainer = DataContainer.builder().build();
         when(customProperties.getDataSourceFile()).thenReturn("path/to/failure/testData.json");
         doThrow(IOException.class).when(objectMapper).writeValue(any(File.class), eq(mockDataContainer));
 

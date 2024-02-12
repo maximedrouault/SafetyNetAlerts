@@ -57,7 +57,7 @@ public class ChildAlertService {
     }
 
 
-    private PersonChildAlertDTO createPersonChildAlertDTO(Person child, int age, List<Person> familyMembers) {
+    public PersonChildAlertDTO createPersonChildAlertDTO(Person child, int age, List<Person> familyMembers) {
 
         return PersonChildAlertDTO.builder()
                 .firstName(child.getFirstName())
