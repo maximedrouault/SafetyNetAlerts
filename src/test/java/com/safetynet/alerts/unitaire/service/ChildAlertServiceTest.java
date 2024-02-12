@@ -13,9 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
@@ -41,10 +40,8 @@ public class ChildAlertServiceTest {
         persons.add(Person.builder().firstName("John").lastName("Boyd").address(address).build());
         persons.add(Person.builder().firstName("Tenley").lastName("Boyd").address(address).build());
         List<MedicalRecord> medicalRecords = new ArrayList<>();
-        medicalRecords.add(MedicalRecord.builder().firstName("John").lastName("Boyd").birthdate("01/01/2000").build());
-        // Create a simulated year of birthdate to make the test immutable
-        String simulatedYearOfBirtDate = LocalDate.now().minusYears(10).format(DateTimeFormatter.ofPattern("yyyy"));
-        medicalRecords.add(MedicalRecord.builder().firstName("Tenley").lastName("Boyd").birthdate("01/01/" + simulatedYearOfBirtDate).build());
+        medicalRecords.add(MedicalRecord.builder().firstName("John").lastName("Boyd").birthdate("03/06/1984").build());
+        medicalRecords.add(MedicalRecord.builder().firstName("Tenley").lastName("Boyd").birthdate("02/18/2012").build());
         DataContainer dataContainer = DataContainer.builder().persons(persons).medicalrecords(medicalRecords).build();
         Map<Person, MedicalRecord> personMedicalRecordMap = new HashMap<>();
         personMedicalRecordMap.put(persons.get(0), medicalRecords.get(0));
@@ -59,15 +56,20 @@ public class ChildAlertServiceTest {
 
         List<PersonChildAlertDTO> personChildAlertDTOS = childAlertService.getChildAlert(address);
 
-        assertEquals(1, personChildAlertDTOS.size());
-        assertEquals("Tenley", personChildAlertDTOS.get(0).getFirstName());
-        assertEquals("Boyd", personChildAlertDTOS.get(0).getLastName());
-        assertEquals(10, personChildAlertDTOS.get(0).getAge());
-        assertEquals(1, personChildAlertDTOS.get(0).getFamilyMembers().size());
-        assertEquals(persons.get(0), personChildAlertDTOS.get(0).getFamilyMembers().get(0));
-        assertEquals("John", personChildAlertDTOS.get(0).getFamilyMembers().get(0).getFirstName());
-        assertEquals("Boyd", personChildAlertDTOS.get(0).getFamilyMembers().get(0).getLastName());
-        assertEquals("1509 Culver St", personChildAlertDTOS.get(0).getFamilyMembers().get(0).getAddress());
+        assertAll("personChildAlertDTOS",
+                () -> assertEquals(1, personChildAlertDTOS.size()),
+                () -> {
+                    PersonChildAlertDTO personChildAlertDTO = personChildAlertDTOS.get(0);
+                    assertEquals("Tenley", personChildAlertDTO.getFirstName());
+                    assertEquals("Boyd", personChildAlertDTO.getLastName());
+                    assertEquals(10, personChildAlertDTO.getAge());
+                    assertEquals(1, personChildAlertDTO.getFamilyMembers().size());
+                    assertEquals(persons.get(0), personChildAlertDTO.getFamilyMembers().get(0));
+                    assertEquals("John", personChildAlertDTO.getFamilyMembers().get(0).getFirstName());
+                    assertEquals("Boyd", personChildAlertDTO.getFamilyMembers().get(0).getLastName());
+                    assertEquals("1509 Culver St", personChildAlertDTO.getFamilyMembers().get(0).getAddress());
+                }
+        );
     }
 
     @Test
@@ -91,7 +93,7 @@ public class ChildAlertServiceTest {
         List<Person> persons = new ArrayList<>();
         persons.add(Person.builder().firstName("John").lastName("Boyd").address(address).build());
         List<MedicalRecord> medicalRecords = new ArrayList<>();
-        medicalRecords.add(MedicalRecord.builder().firstName("John").lastName("Boyd").birthdate("01/01/2000").build());
+        medicalRecords.add(MedicalRecord.builder().firstName("John").lastName("Boyd").birthdate("03/06/1984").build());
         DataContainer dataContainer = DataContainer.builder().persons(persons).medicalrecords(medicalRecords).build();
         Map<Person, MedicalRecord> personMedicalRecordMap = new HashMap<>();
         personMedicalRecordMap.put(persons.get(0), medicalRecords.get(0));
@@ -110,17 +112,11 @@ public class ChildAlertServiceTest {
     public void getChildAlert_WhenAddressIsEmpty_ShouldReturnEmptyList() throws Exception {
         String address = "";
         List<Person> persons = new ArrayList<>();
-        persons.add(Person.builder().firstName("John").lastName("Boyd").address(address).build());
-        List<MedicalRecord> medicalRecords = new ArrayList<>();
-        medicalRecords.add(MedicalRecord.builder().firstName("John").lastName("Boyd").birthdate("01/01/2000").build());
-        DataContainer dataContainer = DataContainer.builder().persons(persons).medicalrecords(medicalRecords).build();
-        Map<Person, MedicalRecord> personMedicalRecordMap = new HashMap<>();
-        personMedicalRecordMap.put(persons.get(0), medicalRecords.get(0));
+        persons.add(Person.builder().firstName("John").lastName("Boyd").address("1509 Culver St").build());
+        DataContainer dataContainer = DataContainer.builder().persons(persons).build();
 
         when(dataReader.dataRead()).thenReturn(dataContainer);
-        when(personUtils.getCoveredPersonsByAddress(anyList(), eq(address))).thenReturn(dataContainer.getPersons());
-        when(medicalRecordUtils.createPersonToMedicalRecordMap(eq(persons), anyList())).thenReturn(personMedicalRecordMap);
-        when(medicalRecordUtils.getChildren(personMedicalRecordMap)).thenReturn(Collections.emptyList());
+        when(personUtils.getCoveredPersonsByAddress(anyList(), eq(address))).thenReturn(Collections.emptyList());
 
         List<PersonChildAlertDTO> personChildAlertDTOS = childAlertService.getChildAlert(address);
 

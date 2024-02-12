@@ -209,7 +209,7 @@ public class MedicalRecordUtilsTest {
         persons.add(Person.builder().firstName("John").lastName("Boyd").build());
         persons.add(Person.builder().firstName("Foster").lastName("Shepard").build());
         List<MedicalRecord> medicalRecords = new ArrayList<>();
-        medicalRecords.add(MedicalRecord.builder().firstName("John").lastName("Boyd").birthdate("01/01/2000").build());
+        medicalRecords.add(MedicalRecord.builder().firstName("John").lastName("Boyd").birthdate("03/06/1984").build());
         // Create a simulated year of birthdate to make the test immutable
         String simulatedYearOfBirtDate = LocalDate.now().minusYears(10).format(DateTimeFormatter.ofPattern("yyyy"));
         medicalRecords.add(MedicalRecord.builder().firstName("Foster").lastName("Shepard").birthdate("01/01/" + simulatedYearOfBirtDate).build());
@@ -226,7 +226,7 @@ public class MedicalRecordUtilsTest {
         persons.add(Person.builder().firstName("John").lastName("Boyd").build());
         persons.add(Person.builder().firstName("Foster").lastName("Shepard").build());
         List<MedicalRecord> medicalRecords = new ArrayList<>();
-        medicalRecords.add(MedicalRecord.builder().firstName("John").lastName("Boyd").birthdate("01/01/2000").build());
+        medicalRecords.add(MedicalRecord.builder().firstName("John").lastName("Boyd").birthdate("03/06/1984").build());
         medicalRecords.add(MedicalRecord.builder().firstName("Foster").lastName("Shepard").birthdate("01/01/2002").build());
 
         int[] counts = medicalRecordUtils.countAdultsAndChildren(persons, medicalRecords);
@@ -257,7 +257,7 @@ public class MedicalRecordUtilsTest {
     public void countAdultsAndChildrenWithEmptyPersonList() {
         List<Person> persons = new ArrayList<>();
         List<MedicalRecord> medicalRecords = new ArrayList<>();
-        medicalRecords.add(MedicalRecord.builder().firstName("John").lastName("Boyd").birthdate("01/01/2000").build());
+        medicalRecords.add(MedicalRecord.builder().firstName("John").lastName("Boyd").birthdate("03/06/1984").build());
 
         int[] counts = medicalRecordUtils.countAdultsAndChildren(persons, medicalRecords);
 
@@ -285,7 +285,7 @@ public class MedicalRecordUtilsTest {
         persons.add(Person.builder().firstName("John").lastName("Boyd").build());
         persons.add(Person.builder().firstName("Foster").lastName("Shepard").build());
         List<MedicalRecord> medicalRecords = new ArrayList<>();
-        medicalRecords.add(MedicalRecord.builder().firstName("John").lastName("Boyd").birthdate("01/01/2000").build());
+        medicalRecords.add(MedicalRecord.builder().firstName("John").lastName("Boyd").birthdate("03/06/1984").build());
         // Create a simulated year of birthdate to make the test immutable
         String simulatedYearOfBirtDate = LocalDate.now().minusYears(10).format(DateTimeFormatter.ofPattern("yyyy"));
         medicalRecords.add(MedicalRecord.builder().firstName("Foster").lastName("Shepard").birthdate("01/01/" + simulatedYearOfBirtDate).build());
@@ -305,7 +305,7 @@ public class MedicalRecordUtilsTest {
         List<Person> persons = new ArrayList<>();
         persons.add(Person.builder().firstName("John").lastName("Boyd").build());
         List<MedicalRecord> medicalRecords = new ArrayList<>();
-        medicalRecords.add(MedicalRecord.builder().firstName("John").lastName("Boyd").birthdate("01/01/2000").build());
+        medicalRecords.add(MedicalRecord.builder().firstName("John").lastName("Boyd").birthdate("03/06/1984").build());
         Map<Person, MedicalRecord> personToMedicalRecordMap = new HashMap<>();
         personToMedicalRecordMap.put(persons.get(0), medicalRecords.get(0));
 

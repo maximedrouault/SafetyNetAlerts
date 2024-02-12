@@ -43,10 +43,11 @@ public class CommunityEmailServiceTest {
         List<PersonCommunityEmailDTO> personCommunityEmailDTOS = communityEmailService.getCommunityEmail(city);
 
         assertEquals(1, personCommunityEmailDTOS.size());
+        assertEquals("jaboyd@email.com", personCommunityEmailDTOS.get(0).getEmail());
     }
 
     @Test
-    public void getCommunityEmail_WhenNoBodyFoundInThisCity_ShouldReturnEmptyList() throws Exception {
+    public void getCommunityEmail_WhenNoBodyFound_ShouldReturnEmptyList() throws Exception {
         String city = "Unknown city";
         List<Person> persons = new ArrayList<>();
         persons.add(Person.builder().firstName("John").lastName("Boyd").city("Culver").email("jaboyd@email.com").build());
