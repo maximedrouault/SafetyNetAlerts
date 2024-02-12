@@ -47,7 +47,7 @@ public class CommunityEmailServiceTest {
     }
 
     @Test
-    public void getCommunityEmail_WhenNoBodyFound_ShouldReturnEmptyList() throws Exception {
+    public void getCommunityEmail_WhenNoBodyFound_ShouldReturnEmptyResponseObject() throws Exception {
         String city = "Unknown city";
         List<Person> persons = new ArrayList<>();
         persons.add(Person.builder().firstName("John").lastName("Boyd").city("Culver").email("jaboyd@email.com").build());
@@ -62,7 +62,7 @@ public class CommunityEmailServiceTest {
     }
 
     @Test
-    public void getCommunityEmail_WhenCityIsEmpty_ShouldReturnEmptyList() throws Exception {
+    public void getCommunityEmail_WhenCityIsEmpty_ShouldReturnEmptyResponseObject() throws Exception {
         String city = "";
         List<Person> persons = new ArrayList<>();
         persons.add(Person.builder().firstName("John").lastName("Boyd").city("Culver").email("jaboyd@email.com").build());

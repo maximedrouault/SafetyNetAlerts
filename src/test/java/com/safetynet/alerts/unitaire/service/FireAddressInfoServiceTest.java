@@ -39,7 +39,7 @@ public class FireAddressInfoServiceTest {
     private FireAddressInfoService fireAddressInfoService;
 
     @Test
-    public void getFireAddressInfo_WhenPersonsCoveredByFireStation_ShouldReturnListOfPersons() throws Exception {
+    public void getFireAddressInfo_WhenPersonsCoveredByFireStation_ShouldReturnListOfPersonsInfos() throws Exception {
         String address = "1509 Culver St";
         List<Person> persons = new ArrayList<>();
         persons.add(Person.builder().firstName("John").lastName("Boyd").address(address).phone("841-874-6512").build());
@@ -65,18 +65,18 @@ public class FireAddressInfoServiceTest {
                 () -> assertEquals(3, fireAddressInfoResponseDTO.getStationNumber()),
                 () -> assertEquals(1, fireAddressInfoResponseDTO.getPersons().size()),
                 () -> {
-                    PersonFireAddressInfoDTO personDTO = fireAddressInfoResponseDTO.getPersons().get(0);
-                    assertEquals("Boyd", personDTO.getLastName());
-                    assertEquals("841-874-6512", personDTO.getPhone());
-                    assertEquals(40, personDTO.getAge());
-                    assertEquals(List.of("aznol:350mg", "hydrapermazol:100mg"), personDTO.getMedications());
-                    assertEquals(List.of("nillacilan"), personDTO.getAllergies());
+                    PersonFireAddressInfoDTO personFireAddressInfoDTO = fireAddressInfoResponseDTO.getPersons().get(0);
+                    assertEquals("Boyd", personFireAddressInfoDTO.getLastName());
+                    assertEquals("841-874-6512", personFireAddressInfoDTO.getPhone());
+                    assertEquals(40, personFireAddressInfoDTO.getAge());
+                    assertEquals(List.of("aznol:350mg", "hydrapermazol:100mg"), personFireAddressInfoDTO.getMedications());
+                    assertEquals(List.of("nillacilan"), personFireAddressInfoDTO.getAllergies());
                 }
         );
     }
 
     @Test
-    public void getFireAddressInfo_WhenNoBodyFoundAtAddress_ShouldReturnEmptyList() throws Exception{
+    public void getFireAddressInfo_WhenNoBodyFoundAtAddress_ShouldReturnEmptyResponseObject() throws Exception{
         String address = "Unknown address";
         List<Person> persons = new ArrayList<>();
         persons.add(Person.builder().firstName("John").lastName("Boyd").address("1509 Culver St").phone("841-874-6512").build());
@@ -92,7 +92,7 @@ public class FireAddressInfoServiceTest {
     }
 
     @Test
-    public void getFireAddressInfo_WhenNoFireStationCoversTheAddress_ShouldReturnEmptyList() throws Exception {
+    public void getFireAddressInfo_WhenNoFireStationCoversTheAddress_ShouldReturnEmptyResponseObject() throws Exception {
         String address = "1509 Culver St";
         List<Person> persons = new ArrayList<>();
         persons.add(Person.builder().firstName("John").lastName("Boyd").address(address).phone("841-874-6512").build());
@@ -111,7 +111,7 @@ public class FireAddressInfoServiceTest {
     }
 
     @Test
-    public void getFireAddressInfo_WhenAddressIsEmpty_ShouldReturnEmptyList() throws Exception {
+    public void getFireAddressInfo_WhenAddressIsEmpty_ShouldReturnEmptyResponseObject() throws Exception {
         String address = "Unknown address";
         List<Person> persons = new ArrayList<>();
         persons.add(Person.builder().firstName("John").lastName("Boyd").address("1509 Culver St").phone("841-874-6512").build());

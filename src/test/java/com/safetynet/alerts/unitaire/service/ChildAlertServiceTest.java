@@ -73,7 +73,7 @@ public class ChildAlertServiceTest {
     }
 
     @Test
-    public void getChildAlert_WhenNoBodyFoundAtAddress_ShouldReturnEmptyList() throws Exception {
+    public void getChildAlert_WhenNoBodyFoundAtAddress_ShouldReturnEmptyResponseObject() throws Exception {
         String address = "Unknown address";
         List<Person> persons = new ArrayList<>();
         persons.add(Person.builder().firstName("John").lastName("Boyd").address("1509 Culver St").build());
@@ -88,7 +88,7 @@ public class ChildAlertServiceTest {
     }
 
     @Test
-    public void getChildAlert_WhenChildrenIsNotPresent_ShouldReturnEmptyList() throws Exception {
+    public void getChildAlert_WhenChildrenIsNotPresent_ShouldReturnEmptyResponseObject() throws Exception {
         String address = "1509 Culver St";
         List<Person> persons = new ArrayList<>();
         persons.add(Person.builder().firstName("John").lastName("Boyd").address(address).build());
@@ -109,7 +109,7 @@ public class ChildAlertServiceTest {
     }
 
     @Test
-    public void getChildAlert_WhenAddressIsEmpty_ShouldReturnEmptyList() throws Exception {
+    public void getChildAlert_WhenAddressIsEmpty_ShouldReturnEmptyResponseObject() throws Exception {
         String address = "";
         List<Person> persons = new ArrayList<>();
         persons.add(Person.builder().firstName("John").lastName("Boyd").address("1509 Culver St").build());
