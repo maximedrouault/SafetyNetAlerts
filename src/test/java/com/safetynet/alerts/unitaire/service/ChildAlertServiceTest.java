@@ -13,11 +13,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
@@ -74,12 +72,13 @@ public class ChildAlertServiceTest {
 
     @Test
     public void getChildAlert_WhenNoBodyFoundAtAddress_ShouldReturnEmptyList() throws Exception {
-        String address = "748 Townings Dr";
+        String address = "Unknown address";
         List<Person> persons = new ArrayList<>();
         persons.add(Person.builder().firstName("John").lastName("Boyd").address("1509 Culver St").build());
         DataContainer dataContainer = DataContainer.builder().persons(persons).build();
 
         when(dataReader.dataRead()).thenReturn(dataContainer);
+        when(personUtils.getCoveredPersonsByAddress(anyList(), eq(address))).thenReturn(Collections.emptyList());
 
         List<PersonChildAlertDTO> personChildAlertDTOS = childAlertService.getChildAlert(address);
 
