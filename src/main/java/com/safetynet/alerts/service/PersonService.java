@@ -104,7 +104,7 @@ public class PersonService {
         Optional<Person> foundPerson = persons.stream()
                 .filter(existingPerson ->
                         existingPerson.getFirstName().equals(personToAdd.getFirstName()) &&
-                                existingPerson.getLastName().equals(personToAdd.getLastName()))
+                        existingPerson.getLastName().equals(personToAdd.getLastName()))
                 .findFirst();
 
         if (foundPerson.isPresent()) {

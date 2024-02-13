@@ -102,7 +102,7 @@ public class FireStationServiceTest {
     }
 
     @Test
-    public void addFireStationMapping_WhenFireStationDoesNotExists_ShouldReturnAddedFireStation() throws Exception {
+    public void addFireStationMapping_WhenFireStationDoesNotExist_ShouldReturnAddedFireStation() throws Exception {
         List<FireStation> fireStations = new ArrayList<>();
         FireStation fireStationToAdd = FireStation.builder().address("1509 Culver St").station(3).build();
         DataContainer dataContainer = DataContainer.builder().firestations(fireStations).build();
