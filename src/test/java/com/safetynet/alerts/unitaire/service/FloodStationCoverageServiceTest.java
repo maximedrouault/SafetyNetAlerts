@@ -108,4 +108,17 @@ public class FloodStationCoverageServiceTest {
 
         assertEquals(0, floodStationCoverageResponseDTO.size());
     }
+
+    @Test
+    public void getFloodStationCoverage_WhenStationNumbersIsEmpty_ShouldReturnEmptyList() throws Exception {
+        List<Integer> stationNumbers = List.of();
+        DataContainer dataContainer = DataContainer.builder().persons(List.of()).medicalrecords(List.of()).firestations(List.of()).build();
+
+        when(dataReader.dataRead()).thenReturn(dataContainer);
+        when(fireStationUtils.getAddressesCoveredByFireStations(anyList(), anyList())).thenReturn(List.of());
+
+        List<FloodStationCoverageResponseDTO> floodStationCoverageResponseDTO = floodStationCoverageService.getFloodStationCoverage(stationNumbers);
+
+        assertEquals(0, floodStationCoverageResponseDTO.size());
+    }
 }

@@ -66,7 +66,7 @@ public class PersonInfoService {
                 .age(age)
                 .email(person.getEmail())
                 .medications(medicalRecord.getMedications())
-                .allergies(medicalRecord.getMedications())
+                .allergies(medicalRecord.getAllergies())
                 .build();
     }
 }
