@@ -36,9 +36,9 @@ public class FireStationServiceTest {
 
         when(dataReader.dataRead()).thenReturn(dataContainer);
 
-        boolean fireStationDeleted = fireStationService.deleteFireStationMapping(fireStations.get(0));
+        boolean deletedFireStation = fireStationService.deleteFireStationMapping(fireStations.get(0));
 
-        assertTrue(fireStationDeleted);
+        assertTrue(deletedFireStation);
         verify(dataWriter, times(1)).dataWrite(any(DataContainer.class));
     }
 
@@ -51,9 +51,9 @@ public class FireStationServiceTest {
 
         when(dataReader.dataRead()).thenReturn(dataContainer);
 
-        boolean fireStationDeleted = fireStationService.deleteFireStationMapping(fireStationToDelete);
+        boolean deletedFireStation = fireStationService.deleteFireStationMapping(fireStationToDelete);
 
-        assertFalse(fireStationDeleted);
+        assertFalse(deletedFireStation);
     }
 
     @Test
@@ -65,9 +65,9 @@ public class FireStationServiceTest {
 
         when(dataReader.dataRead()).thenReturn(dataContainer);
 
-        boolean fireStationDeleted = fireStationService.deleteFireStationMapping(fireStationToDelete);
+        boolean deletedFireStation = fireStationService.deleteFireStationMapping(fireStationToDelete);
 
-        assertFalse(fireStationDeleted);
+        assertFalse(deletedFireStation);
     }
 
     @Test

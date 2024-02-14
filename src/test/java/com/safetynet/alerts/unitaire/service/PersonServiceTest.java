@@ -36,9 +36,9 @@ public class PersonServiceTest {
 
         when(dataReader.dataRead()).thenReturn(dataContainer);
 
-        boolean personDeleted = personService.deletePerson(persons.get(0));
+        boolean deletedPerson = personService.deletePerson(persons.get(0));
 
-        assertTrue(personDeleted);
+        assertTrue(deletedPerson);
         verify(dataWriter, times(1)).dataWrite(any(DataContainer.class));
     }
 
@@ -51,9 +51,9 @@ public class PersonServiceTest {
 
         when(dataReader.dataRead()).thenReturn(dataContainer);
 
-        boolean personDeleted = personService.deletePerson(personToDelete);
+        boolean deletedPerson = personService.deletePerson(personToDelete);
 
-        assertFalse(personDeleted);
+        assertFalse(deletedPerson);
     }
 
     @Test
@@ -65,9 +65,9 @@ public class PersonServiceTest {
 
         when(dataReader.dataRead()).thenReturn(dataContainer);
 
-        boolean personDeleted = personService.deletePerson(personToDelete);
+        boolean deletedPerson = personService.deletePerson(personToDelete);
 
-        assertFalse(personDeleted);
+        assertFalse(deletedPerson);
     }
 
     @Test
