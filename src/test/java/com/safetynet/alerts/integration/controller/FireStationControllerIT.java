@@ -72,9 +72,9 @@ public class FireStationControllerIT {
 
     @Test
     public void deleteFireStation_whenFireStationExist_shouldReturnStatusOK() {
-        FireStation FireStationToDelete = FireStation.builder().address("1509 Culver St").station(3).build();
+        FireStation fireStationToDelete = FireStation.builder().address("1509 Culver St").station(3).build();
 
-        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.DELETE, new HttpEntity<>(FireStationToDelete), Void.class);
+        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.DELETE, new HttpEntity<>(fireStationToDelete), Void.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNull(response.getBody());
@@ -82,9 +82,9 @@ public class FireStationControllerIT {
 
     @Test
     public void deleteFireStation_whenFireStationDoesNotExist_shouldReturnStatusNotFound() {
-        FireStation FireStationToDelete = FireStation.builder().address("29 15th St").station(3).build();
+        FireStation fireStationToDelete = FireStation.builder().address("29 15th St").station(3).build();
 
-        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.DELETE, new HttpEntity<>(FireStationToDelete), Void.class);
+        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.DELETE, new HttpEntity<>(fireStationToDelete), Void.class);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNull(response.getBody());
@@ -92,19 +92,19 @@ public class FireStationControllerIT {
 
     @Test
     public void updateFireStation_whenFireStationExist_shouldReturnUpdatedFireStationAndStatusOK() {
-        FireStation FireStationToUpdate = FireStation.builder().address("1509 Culver St").station(2).build();
+        FireStation fireStationToUpdate = FireStation.builder().address("1509 Culver St").station(2).build();
 
-        ResponseEntity<FireStation> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.PUT, new HttpEntity<>(FireStationToUpdate), FireStation.class);
+        ResponseEntity<FireStation> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.PUT, new HttpEntity<>(fireStationToUpdate), FireStation.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(FireStationToUpdate, response.getBody());
+        assertEquals(fireStationToUpdate, response.getBody());
     }
 
     @Test
     public void updateFireStation_whenFireStationDoesNotExist_shouldReturnStatusNotFound() {
-        FireStation FireStationToDelete = FireStation.builder().address("Unknown address").station(3).build();
+        FireStation fireStationToUpdate = FireStation.builder().address("Unknown address").station(3).build();
 
-        ResponseEntity<FireStation> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.PUT, new HttpEntity<>(FireStationToDelete), FireStation.class);
+        ResponseEntity<FireStation> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.PUT, new HttpEntity<>(fireStationToUpdate), FireStation.class);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNull(response.getBody());
@@ -112,21 +112,31 @@ public class FireStationControllerIT {
 
     @Test
     public void addFireStation_whenFireStationExist_shouldReturnStatusConflict() {
-        FireStation FireStationToAdd = FireStation.builder().address("1509 Culver St").station(3).build();
+        FireStation fireStationToAdd = FireStation.builder().address("1509 Culver St").station(3).build();
 
-        ResponseEntity<FireStation> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.POST, new HttpEntity<>(FireStationToAdd), FireStation.class);
+        ResponseEntity<FireStation> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.POST, new HttpEntity<>(fireStationToAdd), FireStation.class);
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         assertNull(response.getBody());
     }
 
     @Test
-    public void addFireStation_whenFireStationDoesNotExist_shouldReturnAddedFireStationAndStatusOK() {
-        FireStation FireStationToAdd = FireStation.builder().address("21 Jump Street").station(1).build();
+    public void addFireStation_whenFireStationDoesNotExistMatchByAddress_shouldReturnAddedFireStationAndStatusOK() {
+        FireStation fireStationToAdd = FireStation.builder().address("21 Jump Street").station(1).build();
 
-        ResponseEntity<FireStation> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.POST, new HttpEntity<>(FireStationToAdd), FireStation.class);
+        ResponseEntity<FireStation> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.POST, new HttpEntity<>(fireStationToAdd), FireStation.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(FireStationToAdd, response.getBody());
+        assertEquals(fireStationToAdd, response.getBody());
+    }
+
+    @Test
+    public void addFireStation_whenFireStationDoesNotExistMatchByStationNumber_shouldReturnAddedFireStationAndStatusOK() {
+        FireStation fireStationToAdd = FireStation.builder().address("1509 Culver St").station(5).build();
+
+        ResponseEntity<FireStation> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.POST, new HttpEntity<>(fireStationToAdd), FireStation.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(fireStationToAdd, response.getBody());
     }
 }
