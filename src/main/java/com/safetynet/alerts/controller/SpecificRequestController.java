@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
 
 
@@ -66,7 +67,7 @@ public class SpecificRequestController {
     }
 
     // FloodStationCoverage
-    @GetMapping("/flood")
+    @GetMapping("/flood/stations")
     public ResponseEntity<List<FloodStationCoverageResponseDTO>> getFloodStationCoverage(@RequestParam(name = "stations") List<Integer> stationNumbers) throws Exception {
         List<FloodStationCoverageResponseDTO> floodStationCoverageResponseDTOS = floodStationCoverageService.getFloodStationCoverage(stationNumbers);
         return (floodStationCoverageResponseDTOS.isEmpty()) ? ResponseEntity.notFound().build() : ResponseEntity.ok(floodStationCoverageResponseDTOS);

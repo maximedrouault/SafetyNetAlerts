@@ -6,7 +6,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.2.2</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 	<groupId>com.safetynet</groupId>
 	<artifactId>SafetyNetAlerts</artifactId>
@@ -68,10 +68,10 @@
 				<configuration>
 					<excludes>
 						<exclude>**/SafetyNetAlertsApplicationTests.java</exclude>
-						<exclude>**/*Test.java</exclude>
+						<exclude>**/*IT.java</exclude>
 					</excludes>
 					<includes>
-						<include>**/*IT.java</include>
+						<include>**/*Test.java</include>
 					</includes>
 				</configuration>
 				<executions>
@@ -107,6 +107,11 @@
 						</reports>
 					</reportSet>
 				</reportSets>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>3.5.0</version>
 			</plugin>
 		</plugins>
 	</reporting>
