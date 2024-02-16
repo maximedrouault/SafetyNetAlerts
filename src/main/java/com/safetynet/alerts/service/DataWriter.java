@@ -2,11 +2,12 @@ package com.safetynet.alerts.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.safetynet.alerts.CustomProperties;
+import com.safetynet.alerts.config.CustomProperties;
 import com.safetynet.alerts.model.DataContainer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+
 import java.io.File;
 import java.io.IOException;
 
