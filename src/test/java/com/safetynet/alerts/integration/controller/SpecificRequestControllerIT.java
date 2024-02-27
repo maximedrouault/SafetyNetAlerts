@@ -278,7 +278,7 @@ public class SpecificRequestControllerIT {
     @Test
     public void getFireStationCoverage_whenFireStationCoverageResponseDTODoesNotExist_shouldReturnStatusNotFound() {
         String endpoint = "/firestation";
-        int stationNumber = 0;
+        int stationNumber = 10;
 
         ResponseEntity<FireStationCoverageResponseDTO> response = restTemplate.exchange(baseUrl + endpoint + "?stationNumber=" + stationNumber, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
 
@@ -311,7 +311,7 @@ public class SpecificRequestControllerIT {
     @Test
     public void getPhoneAlert_whenPersonPhoneAlertDTOSDoNotExist_shouldReturnStatusNotFound() {
         String endpoint = "/phoneAlert";
-        int stationNumber = 0;
+        int stationNumber = 10;
 
         ResponseEntity<List<PersonPhoneAlertDTO>> response = restTemplate.exchange(baseUrl + endpoint + "?firestation=" + stationNumber, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
 
@@ -508,7 +508,7 @@ public class SpecificRequestControllerIT {
     @Test
     public void getFloodStationCoverage_whenFloodStationCoverageResponseDTOSDoNotExist_shouldReturnStatusNotFound() {
         String endpoint = "/flood/stations";
-        String stationsNumbers = "0, 10";
+        String stationsNumbers = "10, 11";
 
         ResponseEntity<List<FloodStationCoverageResponseDTO>> response = restTemplate.exchange(
                 baseUrl + endpoint + "?stations=" + stationsNumbers,

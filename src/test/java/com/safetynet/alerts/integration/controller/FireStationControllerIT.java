@@ -96,7 +96,7 @@ public class FireStationControllerIT {
     @Test
     public void deleteFireStation_whenFireStationDoesNotExistMatchByStationNumber_shouldReturnStatusNotFound() {
         String address = "1509 Culver St";
-        int stationNumber = 0;
+        int stationNumber = 10;
 
         ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint + "?address=" + address + "&stationNumber=" + stationNumber, HttpMethod.DELETE, null, Void.class);
 

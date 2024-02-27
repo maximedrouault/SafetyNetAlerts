@@ -56,11 +56,11 @@ public class FireStationControllerTest {
 
     @Test
     public void deleteFireStationMapping_whenMappingDoesNotExist_shouldReturnNotFound() throws Exception {
-        when(fireStationService.deleteFireStationMapping("Unknown FireStation", 0)).thenReturn(false);
+        when(fireStationService.deleteFireStationMapping("Unknown FireStation", 3)).thenReturn(false);
 
         mockMvc.perform(delete("/firestation")
                         .param("address", "Unknown FireStation")
-                        .param("stationNumber", "0"))
+                        .param("stationNumber", "3"))
                 .andExpect(status().isNotFound());
     }
 
