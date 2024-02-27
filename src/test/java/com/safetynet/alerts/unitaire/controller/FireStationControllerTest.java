@@ -11,8 +11,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 import java.util.Optional;
-import static org.mockito.Mockito.*;
+
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,27 +36,31 @@ public class FireStationControllerTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        fireStation = FireStation.builder().build();
+        fireStation = FireStation.builder()
+                .address("1509 Culver St")
+                .station(3)
+                .build();
+
         jsonBody = objectMapper.writeValueAsString(fireStation); // Convert object to JSON
     }
 
     @Test
     public void deleteFireStationMapping_whenMappingExists_shouldReturnOk() throws Exception {
-        when(fireStationService.deleteFireStationMapping(fireStation)).thenReturn(true);
+        when(fireStationService.deleteFireStationMapping("1509 Culver St", 3)).thenReturn(true);
 
         mockMvc.perform(delete("/firestation")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonBody))
+                        .param("address", "1509 Culver St")
+                        .param("stationNumber", "3"))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void deleteFireStationMapping_whenMappingDoesNotExist_shouldReturnNotFound() throws Exception {
-        when(fireStationService.deleteFireStationMapping(fireStation)).thenReturn(false);
+        when(fireStationService.deleteFireStationMapping("Unknown FireStation", 0)).thenReturn(false);
 
         mockMvc.perform(delete("/firestation")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonBody))
+                        .param("address", "Unknown FireStation")
+                        .param("stationNumber", "0"))
                 .andExpect(status().isNotFound());
     }
 
@@ -96,6 +103,28 @@ public class FireStationControllerTest {
         when(fireStationService.addFireStationMapping(fireStation)).thenReturn(addedFireStation);
 
         mockMvc.perform(post("/firestation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonBody))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getFireStations_whenFireStationsDoNotExist_shouldReturnNotFound() throws Exception {
+        Optional<List<FireStation>> fireStations = Optional.empty();
+        when(fireStationService.getFireStations()).thenReturn(fireStations);
+
+        mockMvc.perform(get("/firestations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonBody))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void getFireStations_whenFireStationsExist_shouldReturnOK() throws Exception {
+        Optional<List<FireStation>> fireStations = Optional.of(List.of(fireStation));
+        when(fireStationService.getFireStations()).thenReturn(fireStations);
+
+        mockMvc.perform(get("/firestations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonBody))
                 .andExpect(status().isOk());

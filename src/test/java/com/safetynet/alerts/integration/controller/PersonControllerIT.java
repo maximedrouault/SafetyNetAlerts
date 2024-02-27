@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -71,22 +73,33 @@ public class PersonControllerIT {
 
 
     @Test
-    public void deletePerson_whenPersonExist_shouldReturnStatusOK() {
-        Person personToDelete = Person.builder().firstName("Jacob").lastName("Boyd").address("1509 Culver St")
-                .city("Culver").zip("97451").phone("841-874-6513").email("drk@email.com").build();
+    public void deletePerson_whenPersonExists_shouldReturnStatusOK() {
+        String firstName = "John";
+        String lastName = "Boyd";
 
-        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.DELETE, new HttpEntity<>(personToDelete), Void.class);
+        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint + "?firstName=" + firstName + "&lastName=" + lastName, HttpMethod.DELETE, null, Void.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNull(response.getBody());
     }
 
     @Test
-    public void deletePerson_whenPersonDoesNotExist_shouldReturnStatusNotFound() {
-        Person personToDelete = Person.builder().firstName("Jacob").lastName("Foster").address("1509 Culver St")
-                .city("Culver").zip("97451").phone("841-874-6513").email("drk@email.com").build();
+    public void deletePerson_whenPersonDoesNotExistMatchByFirstName_shouldReturnStatusNotFound() {
+        String firstName = "Unknown FirstName";
+        String lastName = "Boyd";
 
-        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.DELETE, new HttpEntity<>(personToDelete), Void.class);
+        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint + "?firstName=" + firstName + "&lastName=" + lastName, HttpMethod.DELETE, null, Void.class);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    public void deletePerson_whenPersonDoesNotExistMatchByLastName_shouldReturnStatusNotFound() {
+        String firstName = "John";
+        String lastName = "Unknown LastName";
+
+        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint + "?firstName=" + firstName + "&lastName=" + lastName, HttpMethod.DELETE, null, Void.class);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNull(response.getBody());
@@ -127,7 +140,7 @@ public class PersonControllerIT {
 
     @Test
     public void addPerson_whenPersonDoesNotExistMatchByFirstName_shouldReturnAddedPersonAndStatusOK() {
-        Person personToAdd = Person.builder().firstName("Jean").lastName("DUPONT").address("29 15th St")
+        Person personToAdd = Person.builder().firstName("Jean").lastName("Boyd").address("29 15th St")
                 .city("Culver").zip("97451").phone("841-874-6513").email("drk@email.com").build();
 
         ResponseEntity<Person> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.POST, new HttpEntity<>(personToAdd), Person.class);
@@ -145,5 +158,36 @@ public class PersonControllerIT {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(personToAdd, response.getBody());
+    }
+
+    @Test
+    public void getPersons_whenPersonsExist_shouldReturnListOfPersonsAndStatusOK() {
+        ResponseEntity<List<Person>> response = restTemplate.exchange(baseUrl + "/persons", HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertFalse(response.getBody().isEmpty());
+        assertAll("Persons",
+                () -> assertEquals(24, response.getBody().size()),
+                () -> {
+                    Person person1 = response.getBody().get(0);
+                    assertEquals("John", person1.getFirstName());
+                    assertEquals("Boyd", person1.getLastName());
+                    assertEquals("1509 Culver St", person1.getAddress());
+                    assertEquals("Culver", person1.getCity());
+                    assertEquals("97451", person1.getZip());
+                    assertEquals("841-874-6512", person1.getPhone());
+                    assertEquals("jaboyd@email.com", person1.getEmail());
+
+                    Person person2 = response.getBody().get(2);
+                    assertEquals("Jacob", person2.getFirstName());
+                    assertEquals("Boyd", person2.getLastName());
+                    assertEquals("1509 Culver St", person2.getAddress());
+                    assertEquals("Culver", person2.getCity());
+                    assertEquals("97451", person2.getZip());
+                    assertEquals("841-874-6513", person2.getPhone());
+                    assertEquals("drk@email.com", person2.getEmail());
+                }
+        );
     }
 }

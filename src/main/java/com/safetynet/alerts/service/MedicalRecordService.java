@@ -5,6 +5,7 @@ import com.safetynet.alerts.model.MedicalRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -23,20 +24,41 @@ public class MedicalRecordService {
     // CRUD
 
     /**
+     * Get all medicalRecords.
+     *
+     * @return An Optional containing the list of medicalRecords if found, or empty if not found.
+     * @throws Exception If an error occurs while retrieving medicalRecords.
+     */
+    public Optional<List<MedicalRecord>> getMedicalRecords() throws Exception {
+        DataContainer dataContainer = dataReader.dataRead();
+        List<MedicalRecord> medicalRecords = dataContainer.getMedicalrecords();
+
+        if (medicalRecords.isEmpty()) {
+            log.error("MedicalRecords not found");
+            return Optional.empty();
+
+        } else {
+            log.info("MedicalRecords successfully retrieved");
+            return Optional.of(medicalRecords);
+        }
+    }
+
+    /**
      * Deletes a medical record.
      *
-     * @param medicalRecordToDelete The medical record to delete.
+     * @param firstName The firstname of the person in the medical record to be deleted.
+     * @param lastName The lastname of the person in the medical record to be deleted.
      * @return True if the medical record was successfully deleted, false otherwise.
      * @throws Exception If an error occurs while deleting the medical record.
      */
-    public boolean deleteMedicalRecord(MedicalRecord medicalRecordToDelete) throws Exception {
+    public boolean deleteMedicalRecord(String firstName, String lastName) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<MedicalRecord> medicalRecords = dataContainer.getMedicalrecords();
 
         Optional<MedicalRecord> foundMedicalRecord = medicalRecords.stream()
                 .filter(existingMedicalRecord ->
-                        existingMedicalRecord.getFirstName().equals(medicalRecordToDelete.getFirstName()) &&
-                        existingMedicalRecord.getLastName().equals(medicalRecordToDelete.getLastName()))
+                        existingMedicalRecord.getFirstName().equals(firstName) &&
+                        existingMedicalRecord.getLastName().equals(lastName))
                 .findFirst();
 
         if (foundMedicalRecord.isPresent()) {
@@ -49,7 +71,7 @@ public class MedicalRecordService {
             return true;
 
         } else {
-            log.error("MedicalRecord not found for person with Firstname: '{}' and Lastname: '{}'.", medicalRecordToDelete.getFirstName(), medicalRecordToDelete.getLastName());
+            log.error("MedicalRecord not found for person with Firstname: '{}' and Lastname: '{}'.", firstName, lastName);
             return false;
         }
     }

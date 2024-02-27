@@ -5,6 +5,7 @@ import com.safetynet.alerts.model.Person;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -23,20 +24,41 @@ public class PersonService {
     // CRUD
 
     /**
-     * Deletes a person.
+     * Get all persons.
      *
-     * @param personToDelete The person to delete.
+     * @return An Optional containing the list of persons if found, or empty if not found.
+     * @throws Exception If an error occurs while retrieving persons.
+     */
+    public Optional<List<Person>> getPersons() throws Exception {
+        DataContainer dataContainer = dataReader.dataRead();
+        List<Person> persons = dataContainer.getPersons();
+
+        if (persons.isEmpty()) {
+            log.error("Persons not found");
+            return Optional.empty();
+
+        } else {
+            log.info("Persons successfully retrieved");
+            return Optional.of(persons);
+        }
+    }
+
+    /**
+     * Delete a person.
+     *
+     * @param firstName The firstName of Person to delete.
+     * @param lastName The lastName of Person to delete.
      * @return True if the person was successfully deleted, false otherwise.
      * @throws Exception If an error occurs while deleting the person.
      */
-    public boolean deletePerson(Person personToDelete) throws Exception {
+    public boolean deletePerson(String firstName, String lastName) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<Person> persons = dataContainer.getPersons();
 
         Optional<Person> foundPerson = persons.stream()
                 .filter(existingPerson ->
-                        existingPerson.getFirstName().equals(personToDelete.getFirstName()) &&
-                        existingPerson.getLastName().equals(personToDelete.getLastName()))
+                        existingPerson.getFirstName().equals(firstName) &&
+                        existingPerson.getLastName().equals(lastName))
                 .findFirst();
 
         if (foundPerson.isPresent()) {
@@ -49,7 +71,7 @@ public class PersonService {
             return true;
 
         } else {
-            log.error("Person not found for person with Firstname: '{}' and Lastname: '{}'.", personToDelete.getFirstName(), personToDelete.getLastName());
+            log.error("Person not found for person with Firstname: '{}' and Lastname: '{}'.", firstName, lastName);
             return false;
         }
     }

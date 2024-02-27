@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -69,22 +71,34 @@ public class FireStationControllerIT {
         }
     }
 
-
     @Test
-    public void deleteFireStation_whenFireStationExist_shouldReturnStatusOK() {
-        FireStation fireStationToDelete = FireStation.builder().address("1509 Culver St").station(3).build();
+    public void deleteFireStation_whenFireStationExists_shouldReturnStatusOK() {
+        String address = "1509 Culver St";
+        int stationNumber = 3;
 
-        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.DELETE, new HttpEntity<>(fireStationToDelete), Void.class);
+        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint + "?address=" + address + "&stationNumber=" + stationNumber, HttpMethod.DELETE, null, Void.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNull(response.getBody());
     }
 
     @Test
-    public void deleteFireStation_whenFireStationDoesNotExist_shouldReturnStatusNotFound() {
-        FireStation fireStationToDelete = FireStation.builder().address("29 15th St").station(3).build();
+    public void deleteFireStation_whenFireStationDoesNotExistMatchByAddress_shouldReturnStatusNotFound() {
+        String address = "Unknown";
+        int stationNumber = 3;
 
-        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.DELETE, new HttpEntity<>(fireStationToDelete), Void.class);
+        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint + "?address=" + address + "&stationNumber=" + stationNumber, HttpMethod.DELETE, null, Void.class);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    public void deleteFireStation_whenFireStationDoesNotExistMatchByStationNumber_shouldReturnStatusNotFound() {
+        String address = "1509 Culver St";
+        int stationNumber = 0;
+
+        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint + "?address=" + address + "&stationNumber=" + stationNumber, HttpMethod.DELETE, null, Void.class);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNull(response.getBody());
@@ -138,5 +152,34 @@ public class FireStationControllerIT {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(fireStationToAdd, response.getBody());
+    }
+
+    @Test
+    public void getFireStations_whenFireStationsExist_shouldReturnListOfFireStationsAndStatusOK() {
+        ResponseEntity<List<FireStation>> response = restTemplate.exchange(baseUrl + "/firestations", HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertFalse(response.getBody().isEmpty());
+        assertAll("FireStations",
+                () -> assertEquals(13, response.getBody().size()),
+                () -> {
+                    FireStation fireStation1 = response.getBody().get(0);
+                    assertEquals("1509 Culver St", fireStation1.getAddress());
+                    assertEquals(3, fireStation1.getStation());
+
+                    FireStation fireStation2 = response.getBody().get(1);
+                    assertEquals("29 15th St", fireStation2.getAddress());
+                    assertEquals(2, fireStation2.getStation());
+
+                    FireStation fireStation3 = response.getBody().get(2);
+                    assertEquals("834 Binoc Ave", fireStation3.getAddress());
+                    assertEquals(3, fireStation3.getStation());
+
+                    FireStation fireStation4 = response.getBody().get(3);
+                    assertEquals("644 Gershwin Cir", fireStation4.getAddress());
+                    assertEquals(1, fireStation4.getStation());
+                }
+        );
     }
 }

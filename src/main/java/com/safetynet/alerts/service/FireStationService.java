@@ -5,6 +5,7 @@ import com.safetynet.alerts.model.FireStation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -23,20 +24,41 @@ public class FireStationService {
     // CRUD
 
     /**
+     * Get fireStations.
+     *
+     * @return An Optional containing the list of fireStations if found, or empty if not found.
+     * @throws Exception If an error occurs while retrieving fireStations.
+     */
+    public Optional<List<FireStation>> getFireStations() throws Exception {
+        DataContainer dataContainer = dataReader.dataRead();
+        List<FireStation> fireStations = dataContainer.getFirestations();
+
+        if (fireStations.isEmpty()) {
+            log.error("FireStations not found");
+            return Optional.empty();
+
+        } else {
+            log.info("FireStations successfully retrieved");
+            return Optional.of(fireStations);
+        }
+    }
+
+    /**
      * Deletes a fire station mapping.
      *
-     * @param fireStationToDelete The FireStation object to be deleted.
+     * @param address The address covered by the FireStation to delete.
+     * @param stationNumber The number of the FireStation to be deleted.
      * @return True if the mapping is successfully deleted, false otherwise.
      * @throws Exception If an error occurs while performing the delete operation.
      */
-    public boolean deleteFireStationMapping(FireStation fireStationToDelete) throws Exception {
+    public boolean deleteFireStationMapping(String address, int stationNumber) throws Exception {
         DataContainer dataContainer = dataReader.dataRead();
         List<FireStation> fireStations = dataContainer.getFirestations();
 
         Optional<FireStation> foundFirestation = fireStations.stream()
                 .filter(existingFireStation ->
-                        existingFireStation.getAddress().equals(fireStationToDelete.getAddress()) &&
-                        existingFireStation.getStation() == fireStationToDelete.getStation())
+                        existingFireStation.getAddress().equals(address) &&
+                        existingFireStation.getStation() == stationNumber)
                 .findFirst();
 
         if (foundFirestation.isPresent()) {
@@ -49,7 +71,7 @@ public class FireStationService {
             return true;
 
         } else {
-            log.error("Fire Station mapping not found for fire station number: '{}' and address: '{}'.", fireStationToDelete.getStation(), fireStationToDelete.getAddress());
+            log.error("Fire Station mapping not found for fire station number: '{}' and address: '{}'.", stationNumber, address);
             return false;
         }
     }

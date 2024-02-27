@@ -11,10 +11,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 import java.util.Optional;
+
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = MedicalRecordController.class)
@@ -34,28 +36,35 @@ public class MedicalRecordControllerTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        medicalRecord = MedicalRecord.builder().build();
+        medicalRecord = MedicalRecord.builder()
+                .firstName("John")
+                .lastName("Boyd")
+                .birthdate("03/06/1984")
+                .medications(List.of("aznol:350mg", "hydrapermazol:100mg"))
+                .allergies(List.of("nillacilan"))
+                .build();
+
         jsonBody = objectMapper.writeValueAsString(medicalRecord); // Convert object to JSON
     }
 
 
     @Test
     public void deleteMedicalRecord_whenMedicalRecordExists_shouldReturnOk() throws Exception {
-        when(medicalRecordService.deleteMedicalRecord(medicalRecord)).thenReturn(true);
+        when(medicalRecordService.deleteMedicalRecord("John", "Boyd")).thenReturn(true);
 
         mockMvc.perform(delete("/medicalRecord")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonBody))
+                        .param("firstName", "John")
+                        .param("lastName", "Boyd"))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void deleteMedicalRecord_whenMedicalRecordDoesNotExist_shouldReturnNotFound() throws Exception {
-        when(medicalRecordService.deleteMedicalRecord(medicalRecord)).thenReturn(false);
+        when(medicalRecordService.deleteMedicalRecord("Unknown", "Person")).thenReturn(false);
 
         mockMvc.perform(delete("/medicalRecord")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonBody))
+                        .param("firstName", "Unknown")
+                        .param("lastName", "Person"))
                 .andExpect(status().isNotFound());
     }
 
@@ -98,6 +107,28 @@ public class MedicalRecordControllerTest {
         when(medicalRecordService.addMedicalRecord(medicalRecord)).thenReturn(addedMedicalRecord);
 
         mockMvc.perform(post("/medicalRecord")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonBody))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getMedicalRecords_whenMedicalRecordsDoNotExist_shouldReturnNotFound() throws Exception {
+        Optional<List<MedicalRecord>> medicalRecords = Optional.empty();
+        when(medicalRecordService.getMedicalRecords()).thenReturn(medicalRecords);
+
+        mockMvc.perform(get("/medicalRecords")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonBody))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void getMedicalRecords_whenMedicalRecordsExist_shouldReturnOK() throws Exception {
+        Optional<List<MedicalRecord>> medicalRecords = Optional.of(List.of(medicalRecord));
+        when(medicalRecordService.getMedicalRecords()).thenReturn(medicalRecords);
+
+        mockMvc.perform(get("/medicalRecords")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonBody))
                 .andExpect(status().isOk());

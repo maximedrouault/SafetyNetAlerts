@@ -12,11 +12,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = PersonController.class)
@@ -36,28 +36,37 @@ public class PersonControllerTest {
 
     @BeforeEach
     public void setUp() throws Exception{
-        person = Person.builder().build();
+        person = Person.builder()
+                .firstName("John")
+                .lastName("Boyd")
+                .address("1509 Culver St")
+                .city("Culver")
+                .zip("97451")
+                .phone("841-874-6512")
+                .email("jaboyd@email.com")
+                .build();
+
         jsonBody = objectMapper.writeValueAsString(person); // Convert object to JSON
     }
 
 
     @Test
     public void deletePerson_whenPersonExists_shouldReturnOk() throws Exception {
-        when(personService.deletePerson(person)).thenReturn(true);
+        when(personService.deletePerson("John", "Boyd")).thenReturn(true);
 
         mockMvc.perform(delete("/person")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonBody))
+                        .param("firstName", "John")
+                        .param("lastName", "Boyd"))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void deletePerson_whenPersonDoesNotExist_shouldReturnNotFound() throws Exception {
-        when(personService.deletePerson(person)).thenReturn(false);
+        when(personService.deletePerson("Unknown", "Person")).thenReturn(false);
 
         mockMvc.perform(delete("/person")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonBody))
+                        .param("firstName", "Unknown")
+                        .param("lastName", "Person"))
                 .andExpect(status().isNotFound());
     }
 
@@ -100,6 +109,28 @@ public class PersonControllerTest {
         when(personService.addPerson(person)).thenReturn(addedPerson);
 
         mockMvc.perform(post("/person")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonBody))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getPersons_whenPersonsDoNotExist_shouldReturnNotFound() throws Exception {
+        Optional<List<Person>> persons = Optional.empty();
+        when(personService.getPersons()).thenReturn(persons);
+
+        mockMvc.perform(get("/persons")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonBody))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void getPersons_whenPersonsExist_shouldReturnOK() throws Exception {
+        Optional<List<Person>> persons = Optional.of(List.of(person));
+        when(personService.getPersons()).thenReturn(persons);
+
+        mockMvc.perform(get("/persons")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonBody))
                 .andExpect(status().isOk());

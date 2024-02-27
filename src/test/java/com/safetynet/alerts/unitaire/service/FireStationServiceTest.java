@@ -10,9 +10,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -36,7 +38,7 @@ public class FireStationServiceTest {
 
         when(dataReader.dataRead()).thenReturn(dataContainer);
 
-        boolean deletedFireStation = fireStationService.deleteFireStationMapping(fireStations.get(0));
+        boolean deletedFireStation = fireStationService.deleteFireStationMapping(fireStations.get(0).getAddress(), fireStations.get(0).getStation());
 
         assertTrue(deletedFireStation);
         verify(dataWriter, times(1)).dataWrite(any(DataContainer.class));
@@ -51,7 +53,7 @@ public class FireStationServiceTest {
 
         when(dataReader.dataRead()).thenReturn(dataContainer);
 
-        boolean deletedFireStation = fireStationService.deleteFireStationMapping(fireStationToDelete);
+        boolean deletedFireStation = fireStationService.deleteFireStationMapping(fireStationToDelete.getAddress(), fireStationToDelete.getStation());
 
         assertFalse(deletedFireStation);
     }
@@ -65,7 +67,7 @@ public class FireStationServiceTest {
 
         when(dataReader.dataRead()).thenReturn(dataContainer);
 
-        boolean deletedFireStation = fireStationService.deleteFireStationMapping(fireStationToDelete);
+        boolean deletedFireStation = fireStationService.deleteFireStationMapping(fireStationToDelete.getAddress(), fireStationToDelete.getStation());
 
         assertFalse(deletedFireStation);
     }
@@ -159,5 +161,35 @@ public class FireStationServiceTest {
         Optional<FireStation> addedFireStation = fireStationService.addFireStationMapping(fireStationToAdd);
 
         assertTrue(addedFireStation.isEmpty());
+    }
+
+    @Test
+    public void getFireStations_WhenFireStationsExist_ShouldReturnListOfFireStations() throws Exception {
+        List<FireStation> fireStations = new ArrayList<>();
+        fireStations.add(FireStation.builder().address("1509 Culver St").station(3).build());
+        DataContainer dataContainer = DataContainer.builder().firestations(fireStations).build();
+
+        when(dataReader.dataRead()).thenReturn(dataContainer);
+
+        Optional<List<FireStation>> fireStationsList = fireStationService.getFireStations();
+
+        assertTrue(fireStationsList.isPresent());
+        assertAll("fireStationsList", () -> {
+            FireStation fireStation = fireStationsList.get().get(0);
+            assertEquals("1509 Culver St", fireStation.getAddress());
+            assertEquals(3, fireStation.getStation());
+        });
+    }
+
+    @Test
+    public void getFireStations_WhenFireStationsDoNotExist_ShouldReturnEmptyOptional() throws Exception {
+        List<FireStation> fireStations = new ArrayList<>();
+        DataContainer dataContainer = DataContainer.builder().firestations(fireStations).build();
+
+        when(dataReader.dataRead()).thenReturn(dataContainer);
+
+        Optional<List<FireStation>> fireStationsList = fireStationService.getFireStations();
+
+        assertTrue(fireStationsList.isEmpty());
     }
 }

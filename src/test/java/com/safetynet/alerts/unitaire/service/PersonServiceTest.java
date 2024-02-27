@@ -10,9 +10,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -36,7 +38,7 @@ public class PersonServiceTest {
 
         when(dataReader.dataRead()).thenReturn(dataContainer);
 
-        boolean deletedPerson = personService.deletePerson(persons.get(0));
+        boolean deletedPerson = personService.deletePerson(persons.get(0).getFirstName(), persons.get(0).getLastName());
 
         assertTrue(deletedPerson);
         verify(dataWriter, times(1)).dataWrite(any(DataContainer.class));
@@ -51,7 +53,7 @@ public class PersonServiceTest {
 
         when(dataReader.dataRead()).thenReturn(dataContainer);
 
-        boolean deletedPerson = personService.deletePerson(personToDelete);
+        boolean deletedPerson = personService.deletePerson(personToDelete.getFirstName(), personToDelete.getLastName());
 
         assertFalse(deletedPerson);
     }
@@ -65,7 +67,7 @@ public class PersonServiceTest {
 
         when(dataReader.dataRead()).thenReturn(dataContainer);
 
-        boolean deletedPerson = personService.deletePerson(personToDelete);
+        boolean deletedPerson = personService.deletePerson(personToDelete.getFirstName(), personToDelete.getLastName());
 
         assertFalse(deletedPerson);
     }
@@ -181,5 +183,41 @@ public class PersonServiceTest {
         Optional<Person> addedPerson = personService.addPerson(personToAdd);
 
         assertTrue(addedPerson.isEmpty());
+    }
+
+    @Test
+    public void getPersons_WhenPersonsExist_ShouldReturnListOfPersons() throws Exception {
+        List<Person> persons = new ArrayList<>();
+        persons.add(Person.builder().firstName("John").lastName("Boyd").address("1509 Culver St")
+                .city("Culver").zip("97451").phone("841-874-6512").email("jaboyd@email.com").build());
+        DataContainer dataContainer = DataContainer.builder().persons(persons).build();
+
+        when(dataReader.dataRead()).thenReturn(dataContainer);
+
+        Optional<List<Person>> personsList = personService.getPersons();
+
+        assertTrue(personsList.isPresent());
+        assertAll("personsList", () -> {
+            Person person = personsList.get().get(0);
+            assertEquals("John", person.getFirstName());
+            assertEquals("Boyd", person.getLastName());
+            assertEquals("1509 Culver St", person.getAddress());
+            assertEquals("Culver", person.getCity());
+            assertEquals("97451", person.getZip());
+            assertEquals("841-874-6512", person.getPhone());
+            assertEquals("jaboyd@email.com", person.getEmail());
+        });
+    }
+
+    @Test
+    public void getPersons_WhenPersonsDoNotExist_ShouldReturnEmptyOptional() throws Exception {
+        List<Person> persons = new ArrayList<>();
+        DataContainer dataContainer = DataContainer.builder().persons(persons).build();
+
+        when(dataReader.dataRead()).thenReturn(dataContainer);
+
+        Optional<List<Person>> personsList = personService.getPersons();
+
+        assertTrue(personsList.isEmpty());
     }
 }

@@ -1,5 +1,6 @@
 package com.safetynet.alerts.model;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
 
@@ -7,12 +8,12 @@ import lombok.Data;
 @Builder
 public class Person {
 
-    private String firstName;
-    private String lastName;
-    private String address;
-    private String city;
-    private String zip;
-    private String phone;
-    private String email;
+    @NotBlank private String firstName;
+    @NotBlank private String lastName;
+    @NotBlank private String address;
+    @NotBlank private String city;
+    @NotBlank private String zip;
+    @NotBlank private String phone;
+    @NotBlank private String email;
 
 }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -72,20 +73,33 @@ public class MedicalRecordControllerIT {
 
 
     @Test
-    public void deleteMedicalRecord_whenMedicalRecordExist_shouldReturnStatusOK() {
-        MedicalRecord medicalRecordToDelete = MedicalRecord.builder().firstName("John").lastName("Boyd").build();
+    public void deleteMedicalRecord_whenMedicalRecordExists_shouldReturnStatusOK() {
+        String firstName = "John";
+        String lastName = "Boyd";
 
-        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.DELETE, new HttpEntity<>(medicalRecordToDelete), Void.class);
+        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint + "?firstName=" + firstName + "&lastName=" + lastName, HttpMethod.DELETE, null, Void.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNull(response.getBody());
     }
 
     @Test
-    public void deleteMedicalRecord_whenMedicalRecordDoesNotExist_shouldReturnStatusNotFound() {
-        MedicalRecord medicalRecordToDelete = MedicalRecord.builder().firstName("Jacob").lastName("Foster").build();
+    public void deleteMedicalRecord_whenMedicalRecordDoesNotExistMatchByFirstName_shouldReturnStatusNotFound() {
+        String firstName = "Unknown FirstName";
+        String lastName = "Boyd";
 
-        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.DELETE, new HttpEntity<>(medicalRecordToDelete), Void.class);
+        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint + "?firstName=" + firstName + "&lastName=" + lastName, HttpMethod.DELETE, null, Void.class);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    public void deleteMedicalRecord_whenMedicalRecordDoesNotExistMatchByLastName_shouldReturnStatusNotFound() {
+        String firstName = "John";
+        String lastName = "Unknown LastName";
+
+        ResponseEntity<Void> response = restTemplate.exchange(baseUrl + endpoint + "?firstName=" + firstName + "&lastName=" + lastName, HttpMethod.DELETE, null, Void.class);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNull(response.getBody());
@@ -93,8 +107,13 @@ public class MedicalRecordControllerIT {
 
     @Test
     public void updateMedicalRecord_whenMedicalRecordExist_shouldReturnUpdatedMedicalRecordAndStatusOK() {
-        MedicalRecord medicalRecordToUpdate = MedicalRecord.builder().firstName("John").lastName("Boyd").birthdate("01/01/1980")
-                .medications(List.of("pharmacol:5000mg", "terazine:10mg", "noznazol:250mg")).allergies(List.of()).build();
+        MedicalRecord medicalRecordToUpdate = MedicalRecord.builder()
+                .firstName("John")
+                .lastName("Boyd")
+                .birthdate("01/01/1980")
+                .medications(List.of("pharmacol:5000mg", "terazine:10mg", "noznazol:250mg"))
+                .allergies(List.of())
+                .build();
 
         ResponseEntity<MedicalRecord> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.PUT, new HttpEntity<>(medicalRecordToUpdate), MedicalRecord.class);
 
@@ -104,7 +123,13 @@ public class MedicalRecordControllerIT {
 
     @Test
     public void updateMedicalRecord_whenMedicalRecordDoesNotExist_shouldReturnStatusNotFound() {
-        MedicalRecord medicalRecordToUpdate = MedicalRecord.builder().firstName("Jacob").lastName("Foster").build();
+        MedicalRecord medicalRecordToUpdate = MedicalRecord.builder()
+                .firstName("Jacob")
+                .lastName("Foster")
+                .birthdate("03/06/1989")
+                .medications(List.of("pharmacol:5000mg", "terazine:10mg", "noznazol:250mg"))
+                .allergies(List.of())
+                .build();
 
         ResponseEntity<MedicalRecord> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.PUT, new HttpEntity<>(medicalRecordToUpdate), MedicalRecord.class);
 
@@ -114,7 +139,13 @@ public class MedicalRecordControllerIT {
 
     @Test
     public void addMedicalRecord_whenMedicalRecordExist_shouldReturnStatusConflict() {
-        MedicalRecord medicalRecordToAdd = MedicalRecord.builder().firstName("John").lastName("Boyd").build();
+        MedicalRecord medicalRecordToAdd = MedicalRecord.builder()
+                .firstName("John")
+                .lastName("Boyd")
+                .birthdate("03/06/1989")
+                .medications(List.of("pharmacol:5000mg", "terazine:10mg", "noznazol:250mg"))
+                .allergies(List.of())
+                .build();
 
         ResponseEntity<MedicalRecord> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.POST, new HttpEntity<>(medicalRecordToAdd), MedicalRecord.class);
 
@@ -124,7 +155,13 @@ public class MedicalRecordControllerIT {
 
     @Test
     public void addMedicalRecord_whenMedicalRecordDoesNotExistMatchByFirstName_shouldReturnAddedMedicalRecordAndStatusOK() {
-        MedicalRecord medicalRecordToAdd = MedicalRecord.builder().firstName("John").lastName("Foster").build();
+        MedicalRecord medicalRecordToAdd = MedicalRecord.builder()
+                .firstName("John")
+                .lastName("Foster")
+                .birthdate("03/06/1989")
+                .medications(List.of("pharmacol:5000mg", "terazine:10mg", "noznazol:250mg"))
+                .allergies(List.of())
+                .build();
 
         ResponseEntity<MedicalRecord> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.POST, new HttpEntity<>(medicalRecordToAdd), MedicalRecord.class);
 
@@ -134,11 +171,44 @@ public class MedicalRecordControllerIT {
 
     @Test
     public void addMedicalRecord_whenMedicalRecordDoesNotExistMatchByLastName_shouldReturnAddedMedicalRecordAndStatusOK() {
-        MedicalRecord medicalRecordToAdd = MedicalRecord.builder().firstName("Shepard").lastName("Boyd").build();
+        MedicalRecord medicalRecordToAdd = MedicalRecord.builder()
+                .firstName("Shepard")
+                .lastName("Boyd")
+                .birthdate("03/06/1989")
+                .medications(List.of("pharmacol:5000mg", "terazine:10mg", "noznazol:250mg"))
+                .allergies(List.of())
+                .build();
 
         ResponseEntity<MedicalRecord> response = restTemplate.exchange(baseUrl + endpoint, HttpMethod.POST, new HttpEntity<>(medicalRecordToAdd), MedicalRecord.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(medicalRecordToAdd, response.getBody());
+    }
+
+    @Test
+    public void getMedicalRecords_whenMedicalRecordsExist_shouldReturnListOfMedicalRecordsAndStatusOK() {
+        ResponseEntity<List<MedicalRecord>> response = restTemplate.exchange(baseUrl + "/medicalRecords", HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertFalse(response.getBody().isEmpty());
+        assertAll("MedicalRecords",
+                () -> assertEquals(23, response.getBody().size()),
+                () -> {
+                    MedicalRecord medicalRecord1 = response.getBody().get(0);
+                    assertEquals("John", medicalRecord1.getFirstName());
+                    assertEquals("Boyd", medicalRecord1.getLastName());
+                    assertEquals("03/06/1984", medicalRecord1.getBirthdate());
+                    assertEquals(List.of("aznol:350mg", "hydrapermazol:100mg"), medicalRecord1.getMedications());
+                    assertEquals(List.of("nillacilan"), medicalRecord1.getAllergies());
+
+                    MedicalRecord medicalRecord2 = response.getBody().get(1);
+                    assertEquals("Jacob", medicalRecord2.getFirstName());
+                    assertEquals("Boyd", medicalRecord2.getLastName());
+                    assertEquals("03/06/1989", medicalRecord2.getBirthdate());
+                    assertEquals(List.of("pharmacol:5000mg", "terazine:10mg", "noznazol:250mg"), medicalRecord2.getMedications());
+                    assertEquals(List.of(), medicalRecord2.getAllergies());
+                }
+        );
     }
 }
